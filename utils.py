@@ -8,6 +8,9 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 
+import time
+import sys, select
+
 
 
 def getUserPage(user):
@@ -98,13 +101,46 @@ def search(term):
     page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
     content = page.content
 
-    sharedData = content.splt('<script type="text/javascript">window._sharedData = ')
+    sharedData = content.split('<script type="text/javascript">window._sharedData = ')
     substrings = sharedData[1].split('}, {')
     struct = []
 
-    for string in substrings[1:-1]:
+    i=0
+    length = len(substrings)
+    print str(length) + ' results'
 
-        struct += [json.loads('{'+substrings+'}')]
+    for string in substrings[1:(length-10)]:
+
+        #print i
+        #i += 1
+        struct += [json.loads('{'+string+'}')]
+
+    return struct
+
+
+
+
+def searchLoop(term, verbose=1):
+
+    struct = []
+    interrupt = False
+    
+    while not interrupt:
+
+        struct += search(term)
+        
+        with open('data/posts.json','w') as outfile:
+            if verbose >= 1:
+                print "Saving posts..."
+                json.dump(struct,outfile)
+
+        #time.sleep(20)
+        rout, wout, exout = select.select( [sys.stdin], [], [], 20 )
+
+        if (rout):
+            interrupt = True
+
+    print "Done (keyboard interrupt)"
 
     return struct
 

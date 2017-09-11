@@ -10,6 +10,7 @@ __pycache__/
 
 # data
 *.json
+*.npy
 
 # API KEYS
 *.info

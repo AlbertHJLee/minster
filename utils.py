@@ -10,6 +10,7 @@ from io import BytesIO
 
 import time
 import sys, select
+import datetime
 
 
 
@@ -96,7 +97,7 @@ def img2numpy(image):
 
 
 
-def search(term):
+def search_old(term):
 
     page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
     content = page.content
@@ -120,27 +121,80 @@ def search(term):
 
 
 
+def search(term):
+
+    page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
+    content = page.content
+
+    sharedData = content.split('<script type="text/javascript">window._sharedData = ')
+    substrings = sharedData[1].split('}, {')
+    struct = []
+
+    length = len(substrings)
+    print str(length) + ' results'
+
+    i=0
+    images = np.zeros([length,750,750,3])
+
+    for string in substrings[1:(length-10)]:
+
+        temp = json.loads('{'+string+'}')
+        
+        id = temp['id']
+        code = temp['code']
+        userid = temp['owner']['id']
+        imgurl = temp['display_src']
+        height = temp['dimensions']['height']
+        width = temp['dimensions']['width']
+        caption = temp['caption']
+        likes = temp['likes']['count']
+        comments = temp['comments']['count']
+        date = temp['date']
+        
+        struct += [{'id':id, 'code':code, 'userid':userid, 
+                    'imgurl':imgurl, 'height':height, 'width':width, 
+                    'caption':caption, 'likes':likes, 'comments':comments, 'date':date}]
+
+        images[i] = Image.open(BytesIO(requests.get(imgurl).content)).resize([750,750])
+        i += 1
+
+    return struct, images
+
+
+
+
 def searchLoop(term, verbose=1):
 
-    struct = []
+    timestamp = str(int(time.time()))
+
+    posts = []
+    images = np.zeros([0,750,750,3])
+    postsfile = 'data/posts_'+term+'_'+timestamp+'.json'
+    imagefile = 'data/images_'+term+'_'+timestamp+'.npy'
+
     interrupt = False
     
     while not interrupt:
 
-        struct += search(term)
+        struct,imageArr = search(term)
+        posts += struct
+        images = np.append(images,imageArr, axis=0)
         
-        with open('data/posts.json','w') as outfile:
+        with open(postsfile,'w') as outfile:
             if verbose >= 1:
                 print "Saving posts..."
-                json.dump(struct,outfile)
+                json.dump(posts,outfile)
+
+        np.save(imagefile,images)
 
         #time.sleep(20)
-        rout, wout, exout = select.select( [sys.stdin], [], [], 20 )
+        rout, wout, exout = select.select( [sys.stdin], [], [], 120 )
 
         if (rout):
             interrupt = True
+            print "Interrupted by", sys.stdin.readline().strip()
 
     print "Done (keyboard interrupt)"
 
-    return struct
+    return posts,images
 

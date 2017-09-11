@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*py~
+
+# emacs
+\#*\#
+.\#*
+
+# data
+*.json
+
+# API KEYS
+*.info
+
+# logs, records
+*.log

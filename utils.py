@@ -2,6 +2,8 @@
 Utils for scraping Instagram
 """
 
+from __future__ import print_function as print3
+
 import requests
 import json
 import numpy as np
@@ -116,12 +118,10 @@ def search_old(term):
 
     i=0
     length = len(substrings)
-    print str(length) + ' results'
+    print(str(length) + ' results')
 
     for string in substrings[1:(length-10)]:
 
-        #print i
-        #i += 1
         struct += [json.loads('{'+string+'}')]
 
     return struct
@@ -141,17 +141,18 @@ def search(term):
     struct = []
 
     length = len(substrings)
-    print str(length) + ' results'
+    print(str(length) + ' results, keeping ' + str(length-11))
+    length += -11
 
     i=0
     images = np.zeros([length,750,750,3])
 
-    for string in substrings[1:(length-10)]:
+    for string in substrings[1:(length+1)]:
 
         temp = json.loads('{'+string+'}')
         
         id = temp['id']
-        code = temp['code']
+        code = temp['code'] #photography_1505164452.json
         userid = temp['owner']['id']
         imgurl = temp['display_src']
         height = temp['dimensions']['height']
@@ -173,7 +174,7 @@ def search(term):
 
 
 
-def searchLoop(term, verbose=1):
+def searchLoop(term, verbose=1, saveImages=True):
 
     """
     Keep scraping tag until keyboard interrupt
@@ -193,11 +194,12 @@ def searchLoop(term, verbose=1):
 
         struct,imageArr = search(term)
         posts += struct
-        images = np.append(images,imageArr, axis=0)
+        if saveImages:
+            images = np.append(images,imageArr, axis=0)
         
         with open(postsfile,'w') as outfile:
             if verbose >= 1:
-                print "Saving posts..."
+                print("Saving posts...")
                 json.dump(posts,outfile)
 
         np.save(imagefile,images)
@@ -207,9 +209,9 @@ def searchLoop(term, verbose=1):
 
         if (rout):
             interrupt = True
-            print "Interrupted by", sys.stdin.readline().strip()
+            print("Interrupted by", sys.stdin.readline().strip())
 
-    print "Done (keyboard interrupt)"
+    print("Done (keyboard interrupt)")
 
     return posts,images
 
@@ -234,15 +236,15 @@ def getData(file='posts_photography_1505164452.json'):
 
 def getUserInfo(username):
 
-    page = requests.get('https://www.instagram.com/'+user)
+    page = requests.get('https://www.instagram.com/'+username)
     soup = bs(page.content, 'html.parser')
     desc = soup.find('meta', property='og:description')['content']
 
     substr = desc.split(' Followers, ')
     followers = substr[0]
-    substr = substr.split(' Following, ')
+    substr = substr[1].split(' Following, ')
     following = substr[0]
-    nposts = substr.split(' Posts')
+    nposts = substr[1].split(' Posts')
 
     return {'followers':followers, 'following':following, 'nposts':nposts}
 
@@ -256,24 +258,38 @@ def userFromPost(post):
 
     try:
         page = requests.get('https://www.instagram.com/p/'+code+'/')
-    except :
-        print 'Request error'
-    content = page.content
+        content = page.content
 
-    #sharedData = content.split('<script type="text/javascript">window._sharedData = ')
-    #jsonString = sharedData[1].split(';</script>')[0]
-    #struct = json.loads(jsonString)
+        print('https://www.instagram.com/p/'+code+'/')
+        
+        soup = bs(content,'html.parser')
+        hashtags = soup.find_all("meta", property="instapp:hashtags")
+        userid = soup.find('meta', property='instapp:owner_user_id')['content']
+        title = soup.find('meta', property='og:title')
+        
+        desc = soup.find('meta', property='og:description')
+        if '(' in desc['content']:
+            username = desc['content'].split('(@')[1].split(')')[0]
+        else:
+            username = desc['content'].split('- @')[1].split(' on Instagram')[0]
+            
+        userData = getUserInfo(username)
+        userData['userid'] = userid
+        userData['username'] = username
 
-    soup = bs(content,'html.parser')
-    hashtags = soup.find_all("meta", property="instapp:hashtags")
-    userid = soup.find('meta', property='instapp:owner_user_id')['content']
-    title = soup.find('meta', property='og:title')
-    desc = soup.find('meta', property='og:description')
-    username = desc['content'].split('(@')[1].split(')')[0]
+    except requests.exceptions.RequestException as error:
+        print('Request error')
 
-    userData = getUserInfo(username)
-    userData['userid'] = userid
-    userData['username'] = username
+        userData = {'followers':-1, 'following':-1, 'nposts':-1}
+        userData['userid'] = ''
+        userData['username'] = ''
+
+    except:
+        print('No page')
+
+        userData = {'followers':-1, 'following':-1, 'nposts':-1}
+        userData['userid'] = ''
+        userData['username'] = ''
 
     return userData
 
@@ -283,14 +299,22 @@ def userFromPost(post):
 def usersFromPosts(posts):
 
     users = []
-    print ''
+    #print ''
+    i = 0
     
     for post in posts:
 
         userData = userFromPost(post)
         users += [userData]
 
-        print '\b.',
+        if (i % 100) == 0:
+            print(':::')
+        elif (i % 10) == 0:
+            print(':')
+        else:
+            print('.',end='')
+            
+        i += 1
 
     return users
 

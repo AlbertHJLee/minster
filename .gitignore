@@ -4,6 +4,9 @@ __pycache__/
 *$py.class
 *py~
 
+# python
+.ipynb_checkpoints/
+
 # emacs
 \#*\#
 .\#*
@@ -17,3 +20,4 @@ __pycache__/
 
 # logs, records
 *.log
+test.ipynb

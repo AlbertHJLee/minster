@@ -12,9 +12,11 @@ import time
 import sys, select
 import datetime
 
+from bs4 import BeautifulSoup as bs
 
 
-def getUserPage(user):
+
+def getUserMedia(user):
 
     """
     Get json of user page data
@@ -30,6 +32,8 @@ def getUserPage(user):
 
 
 def getImage(userpage, index):
+
+    # Get image from user page
 
     struct = json.loads(page.content)
 
@@ -64,6 +68,8 @@ def getImagesOld(userpage):
 
 def getPosts(userpage):
 
+    # Get latest n=25 posts from user page
+
     struct = json.loads(userpage.content)
 
     posts = []
@@ -89,6 +95,8 @@ def getPosts(userpage):
 
 
 def img2numpy(image):
+
+    # Convert image to numpy array for analyses
 
     array = numpy.array(image.getdata()).reshape(image.size[0], image.size[1], 3)
 
@@ -122,6 +130,8 @@ def search_old(term):
 
 
 def search(term):
+
+    # Get latest n~15 posts for a given tag
 
     page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
     content = page.content
@@ -165,6 +175,11 @@ def search(term):
 
 def searchLoop(term, verbose=1):
 
+    """
+    Keep scraping tag until keyboard interrupt
+    wrapper for search()
+    """
+
     timestamp = str(int(time.time()))
 
     posts = []
@@ -197,4 +212,86 @@ def searchLoop(term, verbose=1):
     print "Done (keyboard interrupt)"
 
     return posts,images
+
+
+
+
+def getData(file='posts_photography_1505164452.json'):
+
+    # VERY DEPENDENT ON KEEPING NAMING SCHEME
+    
+    with open('data/'+file,'r') as infile:
+        posts = json.load(infile)
+
+    substr = file.split('posts_')[-1].split('.json')[0]
+    infile = 'data/images_'+substr+'.npy'
+    images = np.load(infile)
+
+    return posts, images
+
+
+
+
+def getUserInfo(username):
+
+    page = requests.get('https://www.instagram.com/'+user)
+    soup = bs(page.content, 'html.parser')
+    desc = soup.find('meta', property='og:description')['content']
+
+    substr = desc.split(' Followers, ')
+    followers = substr[0]
+    substr = substr.split(' Following, ')
+    following = substr[0]
+    nposts = substr.split(' Posts')
+
+    return {'followers':followers, 'following':following, 'nposts':nposts}
+
+
+
+
+    
+def userFromPost(post):
+
+    code = post['code']
+
+    try:
+        page = requests.get('https://www.instagram.com/p/'+code+'/')
+    except :
+        print 'Request error'
+    content = page.content
+
+    #sharedData = content.split('<script type="text/javascript">window._sharedData = ')
+    #jsonString = sharedData[1].split(';</script>')[0]
+    #struct = json.loads(jsonString)
+
+    soup = bs(content,'html.parser')
+    hashtags = soup.find_all("meta", property="instapp:hashtags")
+    userid = soup.find('meta', property='instapp:owner_user_id')['content']
+    title = soup.find('meta', property='og:title')
+    desc = soup.find('meta', property='og:description')
+    username = desc['content'].split('(@')[1].split(')')[0]
+
+    userData = getUserInfo(username)
+    userData['userid'] = userid
+    userData['username'] = username
+
+    return userData
+
+
+
+
+def usersFromPosts(posts):
+
+    users = []
+    print ''
+    
+    for post in posts:
+
+        userData = userFromPost(post)
+        users += [userData]
+
+        print '\b.',
+
+    return users
+
 

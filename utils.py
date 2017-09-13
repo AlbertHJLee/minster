@@ -11,11 +11,13 @@ from PIL import Image
 from io import BytesIO
 
 import time
+import os
 import sys, select
 import datetime
 
 from bs4 import BeautifulSoup as bs
 
+res = 300
 
 
 def getUserMedia(user):
@@ -129,7 +131,7 @@ def search_old(term):
 
 
 
-def search(term):
+def search(term, saveJpgs=False):
 
     # Get latest n~15 posts for a given tag
 
@@ -145,7 +147,7 @@ def search(term):
     length += -11
 
     i=0
-    images = np.zeros([length,750,750,3])
+    images = np.zeros([length,res,res,3])
 
     for string in substrings[1:(length+1)]:
 
@@ -166,7 +168,12 @@ def search(term):
                     'imgurl':imgurl, 'height':height, 'width':width, 
                     'caption':caption, 'likes':likes, 'comments':comments, 'date':date}]
 
-        images[i] = Image.open(BytesIO(requests.get(imgurl).content)).resize([750,750])
+        jpg = Image.open(BytesIO(requests.get(imgurl).content))
+        if saveJpgs:
+            timestamp = str(int(time.time()))
+            jpg.save('data/images/%s_%02d_%s.jpg'%(timestamp,i,id),'JPEG')
+        
+        images[i] = jpg.resize([res,res])
         i += 1
 
     return struct, images
@@ -174,7 +181,7 @@ def search(term):
 
 
 
-def searchLoop(term, verbose=1, saveImages=True):
+def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True):
 
     """
     Keep scraping tag until keyboard interrupt
@@ -192,7 +199,7 @@ def searchLoop(term, verbose=1, saveImages=True):
     
     while not interrupt:
 
-        struct,imageArr = search(term)
+        struct,imageArr = search(term, saveJpgs)
         posts += struct
         if saveImages:
             images = np.append(images,imageArr, axis=0)
@@ -218,7 +225,35 @@ def searchLoop(term, verbose=1, saveImages=True):
 
 
 
-def getData(file='posts_photography_1505164452.json'):
+def imagesFromFiles(substr,nposts):
+
+    files = os.listdir('data/images')
+    files.sort()
+
+    counter = 0
+    start = False
+    images = np.zeros([nposts,res,res,3])
+
+    for file in files:
+
+        if int(file.split('_')[0]) >= int(substr):
+            start = True
+
+        if start:
+            temp = Image.open('data/images/'+file)
+            images[counter] = temp.resize([res,res])
+            counter += 1
+
+        if (counter >= nposts):
+            break
+
+    return images
+
+
+
+
+
+def getData(file='posts_photography_1505164452.json', rawimages=False):
 
     # VERY DEPENDENT ON KEEPING NAMING SCHEME
     
@@ -226,8 +261,14 @@ def getData(file='posts_photography_1505164452.json'):
         posts = json.load(infile)
 
     substr = file.split('posts_')[-1].split('.json')[0]
-    infile = 'data/images_'+substr+'.npy'
-    images = np.load(infile)
+    try:
+        infile = 'data/images_'+substr+'.npy'
+        images = np.load(infile)
+    except:
+        rawimages = True
+
+    if rawimages:
+        images = imagesFromFiles(substr.split('_')[-1].split('.')[0],len(posts))
 
     return posts, images
 

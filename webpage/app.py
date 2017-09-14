@@ -1,19 +1,24 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import pandas as pd
 
 from flask import send_from_directory
-
+#from flask import Session
 
 
 length = 4
 
-UPLOAD_FOLDER = './uploads'
+UPLOAD_FOLDER = 'uploads'
 allowed_extensions = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+#sess = Session()
+app.secret_key = 'super secret key'
+app.config['SESSION_TYPE'] = 'filesystem'
+#sess.init_app(app)
 
 
 
@@ -23,13 +28,15 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 @app.route('/', methods=['GET', 'POST'])
-def upload_file():
+def main():
     if request.method == 'POST':
         # check if the post request has the file part
-        if 'file' not in request.files:
+        if 'filez' not in request.files:
             flash('No file part')
             return redirect(request.url)
-        file = request.files['file']
+        file = request.files['filez']
+        filelist = request.files.getlist('filez')
+        print filelist
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
@@ -38,35 +45,49 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file',
-                                    filename=filename))
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <p><input type=file name=file multiple="">
-         <input type=submit value=Upload>
-    </form>
-    '''
+            session['filepath'] = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            print url_for('uploaded_file')
+
+            return redirect(url_for('uploaded_file'))
+            #return redirect(url_for('uploaded_file',
+            #                        filename=filename))
+
+    return render_template('index.html')
 
 
+"""
 
-
-@app.route('/uploads/<filename>')
+@app.route('/uploads') #/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
 
+"""
+
+@app.route('/output')
+def uploaded_file():
+    """
+    if True:
+        if 'filez' not in request.files:
+            return redirect(request.url)
+        file = request.files['filez']
+        filelist = request.files.getlist('filez')
+        print filelist
+        
+        filename = secure_filename(file.filename)
+
+    fileurl = send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    print fileurl
+    """
+
+    fileurl = session['filepath']
+    print fileurl
+    
+    return render_template('output.html', imagefile=fileurl)
 
 
-
-@app.route('/')
-def main():
-    return render_template('index.html', length=length,
-                           dataframe='<table border="1"> <thead> <tr> <th>lol</th> <th>yea</th> </tr> </thead>'+
-                                     '<tbody> <tr> <th>20</th> <th>10</th> </tr> </tbody> </table>')
 
 
 if __name__ == '__main__':
+
     app.run(debug=True, port=5957)

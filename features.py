@@ -31,20 +31,33 @@ def rgb2xyz(rgb):
 
 
 
-def saturation(image, option='rgb'):
+def colorfulness(image, option='rgb'):
 
     if (option == 'rgb'):
 
         I = image.mean(2)
         C = np.sqrt((image[:,:,0]-I)**2 + (image[:,:,1]-I)**2 + (image[:,:,2]-I)**2)
-        sat = (C+1)/(I+1)
 
     elif (option == 'xyz'):
         
         x,y,_ = rgb2xyz(image)
-        Cxy = np.sqrt(x**2 + y**2)
+        C = np.sqrt(x**2 + y**2)
+
+    return C
+
+
+
+
+def saturation(image, options=['rgb','mean']):
+
+    C = colorfulness(image,options[0])
+ 
+    if (options[1] == 'luma'):
+        I = 0.2126*image[:,:,0] + 0.7152*image[:,:,1] + 0.0722*image[:,:,2]
+    else:
         I = image.mean(2)
-        sat = Cxy/I
+
+    sat = (C+.01)/(I+.1)
 
     return sat
 

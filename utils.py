@@ -20,6 +20,8 @@ from bs4 import BeautifulSoup as bs
 res = 300
 
 
+
+
 def getUserMedia(user):
 
     """
@@ -227,6 +229,11 @@ def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True):
 
 def imagesFromFiles(substr,nposts):
 
+    """
+    Open all images in a directory with the right range of timestamps
+    given a list of posts
+    """
+
     files = os.listdir('data/images')
     files.sort()
 
@@ -256,6 +263,10 @@ def imagesFromFiles(substr,nposts):
 def getData(file='posts_photography_1505164452.json', rawimages=False):
 
     # VERY DEPENDENT ON KEEPING NAMING SCHEME
+
+    """
+    Load data
+    """
     
     with open('data/'+file,'r') as infile:
         posts = json.load(infile)
@@ -294,6 +305,10 @@ def getUserInfo(username):
 
     
 def userFromPost(post):
+
+    """
+    Given a post, retrieve the posting user's info
+    """
 
     code = post['code']
 
@@ -340,7 +355,6 @@ def userFromPost(post):
 def usersFromPosts(posts):
 
     users = []
-    #print ''
     i = 0
     
     for post in posts:
@@ -358,5 +372,77 @@ def usersFromPosts(posts):
         i += 1
 
     return users
+
+
+
+
+
+def updatePost(post):
+
+    code = post['code']
+
+    try:
+        page = requests.get('https://www.instagram.com/p/'+code+'/')
+        content = page.content
+
+        print('https://www.instagram.com/p/'+code+'/')
+        
+        soup = bs(content,'html.parser')
+        hashtags = soup.find_all("meta", property="instapp:hashtags")
+        desc = soup.find('meta', property='og:description')
+        
+        if '(' in desc['content']:
+            username = desc['content'].split('(@')[1].split(')')[0]
+        else:
+            username = desc['content'].split('- @')[1].split(' on Instagram')[0]
+
+        substr = desc['content'].split(' Likes, ')[0]
+        likes = substr[0]
+        comments = substr.split(' Comments')[0]
+
+        newpost = post
+        newpost['timestamp'] = time.timestamp()
+        newpost['hashtags'] = hashtags
+        newpost['likes'] = likes
+        newpost['comments'] = comments
+        
+
+    except requests.exceptions.RequestException as error:
+        print('Request error')
+
+        newpost = post
+        newpost['timestamp'] = 0.
+
+    except:
+        print('No page')
+
+        newpost = post
+        newpost['timestamp'] = 0.
+
+    return newpost
+
+
+
+
+def updateData(posts):
+
+    newposts = []
+    i = 0
+    
+    for post in posts:
+
+        newpost = updatePost(post)
+        newposts += [newpost]
+
+        if (i % 100) == 0:
+            print(':::')
+        elif (i % 10) == 0:
+            print(':')
+        else:
+            print('.',end='')
+            
+        i += 1
+
+    return newposts
 
 

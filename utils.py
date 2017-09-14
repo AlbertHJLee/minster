@@ -183,7 +183,7 @@ def search(term, saveJpgs=False):
 
 
 
-def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True):
+def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True, wait=120):
 
     """
     Keep scraping tag until keyboard interrupt
@@ -214,7 +214,7 @@ def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True):
         np.save(imagefile,images)
 
         #time.sleep(20)
-        rout, wout, exout = select.select( [sys.stdin], [], [], 120 )
+        rout, wout, exout = select.select( [sys.stdin], [], [], wait )
 
         if (rout):
             interrupt = True
@@ -260,7 +260,7 @@ def imagesFromFiles(substr,nposts):
 
 
 
-def getData(file='posts_photography_1505164452.json', rawimages=False):
+def getData(file='posts_photography_1505164452.json', updated=True, rawimages=False):
 
     # VERY DEPENDENT ON KEEPING NAMING SCHEME
 
@@ -272,12 +272,17 @@ def getData(file='posts_photography_1505164452.json', rawimages=False):
         posts = json.load(infile)
 
     substr = file.split('posts_')[-1].split('.json')[0]
+    
     try:
         infile = 'data/images_'+substr+'.npy'
         images = np.load(infile)
     except:
         rawimages = True
 
+    if updated:
+        with open('data/posts2_'+substr+'.json','r') as infile:
+            posts = json.load(infile)
+    
     if rawimages:
         images = imagesFromFiles(substr.split('_')[-1].split('.')[0],len(posts))
 
@@ -304,7 +309,7 @@ def getUserInfo(username):
 
 
     
-def userFromPost(post):
+def userFromPost(post, verbose=1):
 
     """
     Given a post, retrieve the posting user's info
@@ -316,7 +321,8 @@ def userFromPost(post):
         page = requests.get('https://www.instagram.com/p/'+code+'/')
         content = page.content
 
-        print('https://www.instagram.com/p/'+code+'/')
+        if verbose >= 2:
+            print('https://www.instagram.com/p/'+code+'/')
         
         soup = bs(content,'html.parser')
         hashtags = soup.find_all("meta", property="instapp:hashtags")
@@ -352,14 +358,14 @@ def userFromPost(post):
 
 
 
-def usersFromPosts(posts):
+def usersFromPosts(posts, verbose=1):
 
     users = []
     i = 0
     
     for post in posts:
 
-        userData = userFromPost(post)
+        userData = userFromPost(post, verbose)
         users += [userData]
 
         if (i % 100) == 0:
@@ -377,18 +383,20 @@ def usersFromPosts(posts):
 
 
 
-def updatePost(post):
+def updatePost(post, verbose=1):
 
     code = post['code']
+    newpost = post.copy()
 
     try:
         page = requests.get('https://www.instagram.com/p/'+code+'/')
         content = page.content
 
-        print('https://www.instagram.com/p/'+code+'/')
+        if verbose >= 2:
+            print('https://www.instagram.com/p/'+code+'/')
         
         soup = bs(content,'html.parser')
-        hashtags = soup.find_all("meta", property="instapp:hashtags")
+        #hashtags = soup.find_all("meta", property="instapp:hashtags")
         desc = soup.find('meta', property='og:description')
         
         if '(' in desc['content']:
@@ -396,27 +404,27 @@ def updatePost(post):
         else:
             username = desc['content'].split('- @')[1].split(' on Instagram')[0]
 
-        substr = desc['content'].split(' Likes, ')[0]
+        substr = desc['content'].split(' Likes, ')
         likes = substr[0]
-        comments = substr.split(' Comments')[0]
+        comments = substr[1].split(' Comments')[0]
 
-        newpost = post
-        newpost['timestamp'] = time.timestamp()
-        newpost['hashtags'] = hashtags
+        newpost['timestamp'] = time.time()
+        #newpost['hashtags'] = hashtags
         newpost['likes'] = likes
         newpost['comments'] = comments
         
 
     except requests.exceptions.RequestException as error:
         print('Request error')
-
-        newpost = post
         newpost['timestamp'] = 0.
 
     except:
-        print('No page')
-
-        newpost = post
+        if verbose >= 3:
+            print('No page')
+        elif verbose >= 2:
+            print('NP',end='')
+        elif verbose >= 1:
+            print('N',end='')
         newpost['timestamp'] = 0.
 
     return newpost
@@ -424,14 +432,14 @@ def updatePost(post):
 
 
 
-def updateData(posts):
+def updateData(posts, verbose=1):
 
     newposts = []
     i = 0
     
     for post in posts:
 
-        newpost = updatePost(post)
+        newpost = updatePost(post, verbose)
         newposts += [newpost]
 
         if (i % 100) == 0:
@@ -442,6 +450,8 @@ def updateData(posts):
             print('.',end='')
             
         i += 1
+
+    print('')
 
     return newposts
 

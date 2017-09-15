@@ -8,11 +8,10 @@ import numpy as np
 from PIL import Image
 from io import BytesIO
 
-#from .. import features
-#from .. import utils
+from scipy.misc import imresize
 
-import ..insta import features
-import ..insta import utils
+import features
+import utils
 
 res=300
 
@@ -21,6 +20,9 @@ res=300
 
 def likesFromModel(image):
 
+    nbins = 20
+    dims = 5
+    
     contrast = features.contrast(image)
 
     satH,_ = np.histogram(features.colorfulness(image), bins=nbins)
@@ -32,7 +34,7 @@ def likesFromModel(image):
     contrast = features.contrast(image)
     comp = imresize(intensity,[dims,dims]).reshape([dims**2])
 
-    likes = contrast
+    likes = sat #contrast
     
     return likes
 

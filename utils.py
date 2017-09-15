@@ -104,7 +104,7 @@ def img2numpy(image):
 
     # Convert image to numpy array for analyses
 
-    array = numpy.array(image.getdata()).reshape(image.size[0], image.size[1], 3)
+    array = np.array(image.getdata()).reshape(image.size[0], image.size[1], 3)
 
     return array
 

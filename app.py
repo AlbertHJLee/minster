@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import pandas as pd
+import shutil
 
 from flask import send_from_directory
 
@@ -73,13 +74,19 @@ def uploaded_file(filename):
 @app.route('/output')
 def uploaded_file():
 
-    fileurl = session['filepath'][0]
-    print fileurl
+    #fileurl = session['filepath'][0]
+    #print fileurl
 
     imagefiles = session['filepath']
-    fileurl = pickbest(imagefiles)
+    fileurl = model.pickbest(imagefiles)
+
+    print fileurl
+
+    filepart = fileurl.split('/')[1]
+    fileout = 'static/'+filepart
+    shutil.copy2(fileurl,fileout)
     
-    return render_template('output.html', imagefile=fileurl)
+    return render_template('output.html', imagefile=fileout)
 
 
 

@@ -4,8 +4,8 @@ from werkzeug.utils import secure_filename
 import pandas as pd
 
 from flask import send_from_directory
-#from flask import Session
 
+import model
 
 length = 4
 
@@ -30,27 +30,33 @@ def allowed_file(filename):
 @app.route('/', methods=['GET', 'POST'])
 def main():
     if request.method == 'POST':
+        
         # check if the post request has the file part
         if 'filez' not in request.files:
             flash('No file part')
             return redirect(request.url)
-        file = request.files['filez']
+        file0 = request.files['filez']
         filelist = request.files.getlist('filez')
-        print filelist
+        #print filelist
+        
         # if user does not select file, browser also
         # submit a empty part without filename
-        if file.filename == '':
+        if file0.filename == '':
             flash('No selected file')
             return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            session['filepath'] = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            print url_for('uploaded_file')
 
-            return redirect(url_for('uploaded_file'))
-            #return redirect(url_for('uploaded_file',
-            #                        filename=filename))
+        session['filepath'] = []
+        for file in filelist:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename) 
+                file.save(filepath)
+                session['filepath'] += [filepath]
+                #print url_for('uploaded_file')
+
+        return redirect(url_for('uploaded_file'))
+                #return redirect(url_for('uploaded_file',
+                #                        filename=filename))
 
     return render_template('index.html')
 
@@ -66,22 +72,12 @@ def uploaded_file(filename):
 
 @app.route('/output')
 def uploaded_file():
-    """
-    if True:
-        if 'filez' not in request.files:
-            return redirect(request.url)
-        file = request.files['filez']
-        filelist = request.files.getlist('filez')
-        print filelist
-        
-        filename = secure_filename(file.filename)
 
-    fileurl = send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    fileurl = session['filepath'][0]
     print fileurl
-    """
 
-    fileurl = session['filepath']
-    print fileurl
+    imagefiles = session['filepath']
+    fileurl = pickbest(imagefiles)
     
     return render_template('output.html', imagefile=fileurl)
 

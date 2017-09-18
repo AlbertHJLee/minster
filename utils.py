@@ -32,6 +32,15 @@ def saveJson(struct,file):
 
 
 
+def openJson(file):
+
+    with open(file,'r') as infile:
+        data = json.load(infile)
+
+    return data
+
+
+
 def getUserMedia(user):
 
     """
@@ -466,3 +475,67 @@ def updateData(posts, verbose=1):
     return newposts
 
 
+
+
+
+def dataFromScraper(account, getImages=True):
+
+    """
+    Get data from instagram-scraper output
+    Match format of utils output
+    """
+
+    dir = os.path.join('/home','albert','Data','scraper',account)
+    struct = openJson(os.path.join(dir,account+'.json'))
+
+    data = []
+    nposts = len(struct)
+
+    if getImages:
+        images = np.zeros([nposts,res,res,3])
+        counter = 0
+    else:
+        images = []
+        
+    for post in struct:
+
+        #userid
+        username = post[u'user'][u'username']
+        #followers
+        #following
+        #nposts
+        id = post[u'id']
+        code = post[u'code']
+        userid = post[u'user'][u'id']
+        image = post[u'images'][u'standard_resolution']
+        imgurl = image[u'url']
+        height = image[u'height']
+        width = image[u'width']
+        captiondata = post[u'caption']
+        if (captiondata is None):
+            caption = ''
+            createdtime = ''
+        else:
+            caption = captiondata[u'text']
+            createdtime = captiondata[u'created_time']
+        likes = post[u'likes'][u'count']
+        comments = post[u'comments'][u'count']
+        date = createdtime
+
+        temp = {'id':id, 'code':code, 'userid':userid, 
+                'imgurl':imgurl, 'height':height, 'width':width, 
+                'caption':caption, 'likes':likes, 'comments':comments, 'date':date,
+                'createdtime':createdtime}
+
+        data += [temp]
+
+        if getImages:
+            filename = os.path.join(dir,str(imgurl).split('/')[-1])
+            if os.path.isfile(filename):
+                temp = Image.open(filename)
+                images[counter] = temp.resize([res,res])
+            else:
+                images[counter] = 0.
+            counter += 1
+        
+    return data, images

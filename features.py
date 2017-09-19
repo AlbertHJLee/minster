@@ -1,5 +1,5 @@
 """
-Library of functions for extracting features from images
+Library of functions for extracting features from images and metadata
 """
 
 
@@ -8,6 +8,12 @@ from PIL import Image
 from io import BytesIO
 
 
+
+
+
+"""
+Image features
+"""
 
 
 def contrast(image):
@@ -60,4 +66,88 @@ def saturation(image, options=['rgb','mean']):
     sat = (C+.01)/(I+.1)
 
     return sat
+
+
+
+def compKernels(res):
+
+    """
+    Kernels for extracting compositional features in image
+    i.e. is the image centered, skewed, etc.
+    built from sinc interpolation and sine functions
+    
+    Maybe better to use cosine and sine?
+    """
+
+    offset = float(int(float(res)*.5))
+    x = (np.arange(res)-offset)/offset
+    sinc = np.sinc(x)
+    sinc = sinc-np.mean(sinc)
+
+    sin = np.sin(x*np.pi*0.7)
+    sin = sin - np.mean(sin)
+
+    xx = np.zeros([res,res])
+    for i in range(res):
+        xx[i,:] = x 
+
+    yy = np.zeros([res,res])
+    for i in range(res):
+        yy[:,i] = x 
+
+    corner1 = np.exp(-((xx-0.3)**2+(yy-0.3)**2))
+    mean = np.mean(corner1)
+    corner1 += -mean
+    corner2 = np.exp(-((xx-0.3)**2+(yy+0.3)**2)) - mean
+    corner3 = np.exp(-((xx+0.3)**2+(yy-0.3)**2)) - mean
+    corner4 = np.exp(-((xx+0.3)**2+(yy+0.3)**2)) - mean
+    
+    return sinc, sin, corner1, corner2, corner3, corner4
+
+
+
+
+def compKernels5():
+
+    notcos = np.array([-.7,.2,1.,.2,-.7])
+    notsin = np.array([-1.,-.7,0.,.7,1.])
+
+    corner1 = np.array([])
+
+    return notcos, notsin
+
+
+
+
+
+
+"""
+Textual features
+"""
+
+
+def not_in_list(x,args,y):
+    list = x['caption'].split(' #')
+    return not (args in list[1:])
+
+
+
+
+def convertString(x):
+    string = str(x)
+    if 'k' in string:
+        number = float( ''.join(string.split('k')[0].split(',')) ) * 1000
+    elif 'm' in string:
+        number = float( ''.join(string.split('m')[0].split(',')) ) * 1000000
+    else:
+        number = float( ''.join(string.split(',')) )
+    return number
+
+
+
+def likesFromPandas(df):
+    return df['likes'].apply(lambda x: float(convertString(x))).values
+
+def ntagsFromPandas(df):
+    return df[u'caption'].apply(lambda x: float( len(x.split(' #')) ) ).values - 1
 

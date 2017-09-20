@@ -18,8 +18,9 @@ Image features
 
 def contrast(image):
 
-    #hist = np.histogram(image)
-
+    # "contrast" measured as the standard deviation
+    # Other metric might be better
+    
     return np.sqrt( np.var(image) )
 
 
@@ -27,6 +28,8 @@ def contrast(image):
 
 
 def rgb2xyz(rgb):
+
+    # Convert to XYZ color space
 
     x = 0.49*rgb[:,:,0] + 0.31*rgb[:,:,1] + 0.2*rgb[:,:,2]
     y = 0.177*rgb[:,:,0] + 0.812*rgb[:,:,1] + 0.011*rgb[:,:,2]
@@ -38,6 +41,8 @@ def rgb2xyz(rgb):
 
 
 def colorfulness(image, option='rgb'):
+
+    # How far the RGB components are removed from true gray
 
     if (option == 'rgb'):
 
@@ -55,6 +60,8 @@ def colorfulness(image, option='rgb'):
 
 
 def saturation(image, options=['rgb','mean']):
+
+    # Given some brightness, how colorful the RGB components are
 
     C = colorfulness(image,options[0])
  
@@ -134,6 +141,10 @@ def not_in_list(x,args,y):
 
 
 def convertString(x):
+
+    # Converts textual description of likes to integer
+    # i.e. - '16.5k' -> 16,500
+    
     string = str(x)
     if 'k' in string:
         number = float( ''.join(string.split('k')[0].split(',')) ) * 1000
@@ -145,9 +156,25 @@ def convertString(x):
 
 
 
+
+def extractTimeData(x):
+
+    # Get time data from timestamp
+    # use indexing to get weekday or hour
+    
+    createdtime = datetime.fromtimestamp(int(x))
+    hour = createdtime.hour
+    weekday = createdtime.weekday()
+    return weekday, hour    #date(2017,9,16).weekday()
+
+
+
 def likesFromPandas(df):
     return df['likes'].apply(lambda x: float(convertString(x))).values
 
+
 def ntagsFromPandas(df):
     return df[u'caption'].apply(lambda x: float( len(x.split(' #')) ) ).values - 1
+
+
 

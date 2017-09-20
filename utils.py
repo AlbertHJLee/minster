@@ -42,26 +42,6 @@ def openJson(file):
 
 
 
-def not_in_list(x,args,y):
-    list = x['caption'].split(' #')
-    return not (args in list[1:])
-
-
-
-
-def convertString(x):
-    string = str(x)
-    if 'k' in string:
-        number = float( ''.join(string.split('k')[0].split(',')) ) * 1000
-    elif 'm' in string:
-        number = float( ''.join(string.split('m')[0].split(',')) ) * 1000000
-    else:
-        number = float( ''.join(string.split(',')) )
-    return number
-
-
-
-
 
 def getUserMedia(user):
 

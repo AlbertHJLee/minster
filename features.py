@@ -162,14 +162,20 @@ def extractTimeData(x):
     # Get time data from timestamp
     # use indexing to get weekday or hour
     
-
-def extractTimeData(x):
-    if not (type(x) is int):
+    if (type(x) is unicode):
+        createdtime = datetime.fromtimestamp(int(x))
+        hour = createdtime.hour
+        weekday = createdtime.weekday()
+        #date(2017,9,16).weekday()
+        return weekday, hour
+    elif type(x) is int:
+        createdtime = datetime.fromtimestamp(x)
+        hour = createdtime.hour
+        weekday = createdtime.weekday()
+        #date(2017,9,16).weekday()
+        return weekday, hour
+    else:
         return 7, 25
-    createdtime = datetime.fromtimestamp(int(x))
-    hour = createdtime.hour
-    weekday = createdtime.weekday()
-    return weekday, hour
 
 
 def likesFromPandas(df):

@@ -1,9 +1,14 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1>Pick your images :)</h1>
-<form method=post enctype=multipart/form-data>
-  <p><input type=file name=filez multiple="">
-     <input type=submit value=Upload> </p>
-</form>
+
+<div class="container">
+
+  <h1>Pick your images :)</h1>
+  <form method=post enctype=multipart/form-data class="form_signin">
+    <p><input type=file name=filez multiple=""> <input type=submit value=Upload> </p>
+  </form>
+
+</div>
+
 {% endblock %}
 

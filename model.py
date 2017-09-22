@@ -52,6 +52,28 @@ def pickbest(images):
         npimages[i] = utils.img2numpy(image.resize([res,res]))
         likes[i] = likesFromModel(npimages[i])
 
+    #bestimage = images[ np.where(likes == likes.max())[0][0] ]
+
+    order = likes.argsort().tolist()
+
+    if nimages >= 4:
+        return [images[i] for i in order[-4:]]
+    else:
+        return images[order[-1]]
+
+
+
+def pickbest2(images):
+
+    nimages = len(images)
+    likes = np.zeros(nimages)
+    npimages = np.zeros([nimages,res,res,3])
+    
+    for i in range(nimages):
+        image = Image.open(images[i])
+        npimages[i] = utils.img2numpy(image.resize([res,res]))
+        likes[i] = likesFromModel(npimages[i])
+
     bestimage = images[ np.where(likes == likes.max())[0][0] ]
     
     return bestimage

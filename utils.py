@@ -316,7 +316,7 @@ def getData(file='posts_photography_1505164452.json', updated=True, rawimages=Fa
         rawimages = True
 
     if updated:
-        with open('data/posts2_'+substr+'.json','r') as infile:
+        with open('data/posts3_'+substr+'.json','r') as infile:
             posts = json.load(infile)
     
     if rawimages:

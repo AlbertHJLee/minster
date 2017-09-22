@@ -1,8 +1,74 @@
-{% extends "layout.html" %}
-{% block body %}
-<h1>Top Pic</h1>
-<div>
-  <img src={{imagefile}} alt="Best Picture Ever">
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
 
+
+  <head>
+    <link rel="icon" href="../static/assets/favicon.png">
+
+    <title>Upload new File</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/styles/customstyle.css" rel="stylesheet">
+    <link href="../static/styles/navbar-top.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/4.0/examples/navbar-top/navbar-top.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/4.0/examples/album/album.css" rel="stylesheet">
+
+  </head>
+
+
+
+  <body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <a class="navbar-brand" href="#">pickit</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://alberthjlee.github.io/">About</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="jumbotron">
+      <div class="container">
+	<h2>Top Pic</h2>
+	<div>
+	  <img src={{imagefile}} alt="Best Picture Ever" height=400px width=400px>
+	</div>
+      </div>
+    </div>
+
+    <div class="album text-muted">
+      <div class="container">
+
+	<h4>Other Pics</h4>
+        <div class="row">
+          <div class="card">
+            <img src={{imagefile1}} alt="Card image cap">
+          </div>
+          <div class="card">
+            <img src={{imagefile2}} alt="Card image cap">
+          </div>
+          <div class="card">
+            <img src={{imagefile3}} alt="Card image cap">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </body>
+
+
+
+</html>

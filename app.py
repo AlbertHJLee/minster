@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 import pandas as pd
 import shutil
@@ -46,6 +46,7 @@ def main():
             flash('No selected file')
             return redirect(request.url)
 
+        flash('%d file(s) selected'%len(filelist))
         session['filepath'] = []
         for file in filelist:
             if file and allowed_file(file.filename):
@@ -55,6 +56,7 @@ def main():
                 session['filepath'] += [filepath]
                 #print url_for('uploaded_file')
 
+        flash('%d file(s) selected'%len(filelist))
         return redirect(url_for('uploaded_file'))
                 #return redirect(url_for('uploaded_file',
                 #                        filename=filename))
@@ -80,14 +82,23 @@ def uploaded_file():
     imagefiles = session['filepath']
     fileurl = model.pickbest(imagefiles)
 
-    print fileurl
+    files = []
+    if len(imagefiles) >= 4:
+        for tempurl in imagefiles:
+            filepart = tempurl.split('/')[1]
+            files += ['static/'+filepart]
+            shutil.copy2(tempurl,files[-1])
+        return render_template('output.html', imagefile=files[3],
+                               imagefile1=files[0], imagefile2=files[1], imagefile3=files[2])
 
+    print fileurl[0],type(fileurl[0])
+    
     filepart = fileurl.split('/')[1]
     fileout = 'static/'+filepart
     shutil.copy2(fileurl,fileout)
-    
-    return render_template('output.html', imagefile=fileout)
 
+    return render_template('output.html', imagefile=fileout,
+                           imagefile1=fileout, imagefile2=fileout, imagefile3=fileout)
 
 
 

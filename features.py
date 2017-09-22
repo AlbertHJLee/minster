@@ -178,6 +178,18 @@ def extractTimeData(x):
         return 7, 25
 
 
+    
+def getnposts(x):
+    if type(x) is list:
+        npostunicode = x[0]
+        return convertString(npostunicode)
+    elif type(x) is unicode:
+        return convertString(x)
+    else:
+        return -1
+
+
+    
 def likesFromPandas(df):
     return df['likes'].apply(lambda x: float(convertString(x))).values
 

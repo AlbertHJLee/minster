@@ -132,6 +132,21 @@ def img2numpy(image):
 
 
 
+
+def jsonStructFromPageContent(content):
+
+    string = content.split('<script type="text/javascript">window._sharedData = ')
+    string = string[1].split(';</script>')[0]
+
+    struct = json.loads(string)
+
+    return struct
+    
+
+
+
+
+
 def search_old(term):
 
     page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
@@ -322,7 +337,16 @@ def getUserInfo(username):
     followers = substr[0]
     substr = substr[1].split(' Following, ')
     following = substr[0]
-    nposts = substr[1].split(' Posts')
+    nposts = substr[1].split(' Posts')[0]
+
+    struct = jsonStructFromPageContent(page.content)
+    likes = []
+    comments = []
+    counter = 0
+    for node in struct[u'entry_data'][u'ProfilePage'][0][u'user'][u'media'][u'nodes']:
+        likes += [ node[u'likes'][u'count'] ]
+        comments += [ node[u'comments'][u'count'] ]
+        counter += 1
 
     return {'followers':followers, 'following':following, 'nposts':nposts}
 
@@ -346,7 +370,7 @@ def userFromPost(post, verbose=1):
             print('https://www.instagram.com/p/'+code+'/')
         
         soup = bs(content,'html.parser')
-        hashtags = soup.find_all("meta", property="instapp:hashtags")
+        #hashtags = soup.find_all("meta", property="instapp:hashtags")
         userid = soup.find('meta', property='instapp:owner_user_id')['content']
         title = soup.find('meta', property='og:title')
         
@@ -409,6 +433,13 @@ def updatePost(post, verbose=1):
     code = post['code']
     newpost = post.copy()
 
+    # Features that should have been included in original parser
+    newpost['fb_app_id'] = 0
+    newpost['medium'] = 0
+    newpost['mediumtype'] = 0
+    newpost['ismultiple'] = 0
+
+
     try:
         page = requests.get('https://www.instagram.com/p/'+code+'/')
         content = page.content
@@ -417,7 +448,7 @@ def updatePost(post, verbose=1):
             print('https://www.instagram.com/p/'+code+'/')
         
         soup = bs(content,'html.parser')
-        #hashtags = soup.find_all("meta", property="instapp:hashtags")
+        hashtags = soup.find_all("meta", property="instapp:hashtags")
         desc = soup.find('meta', property='og:description')
         
         if '(' in desc['content']:
@@ -430,9 +461,25 @@ def updatePost(post, verbose=1):
         comments = substr[1].split(' Comments')[0]
 
         newpost['timestamp'] = time.time()
-        #newpost['hashtags'] = hashtags
+        if type(hashtags) is list:
+            newpost['hashtags'] = hashtags
         newpost['likes'] = likes
         newpost['comments'] = comments
+
+        # Features that should have been included in original parser
+        
+        newpost['fb_app_id'] = soup.find('meta', property='fb:app_id')['content']
+        #newpost['medium'] = soup.find('meta', name='medium')['content']
+        newpost['mediumtype'] = soup.find('meta', property='og:type')['content']
+        if len(content.split('sidecar')) > 2:
+            newpost['ismultiple'] = 2
+        elif len(content.split('sidecar')) == 2:
+            newpost['ismultiple'] = 1
+        else:
+            newpost['ismultiple'] = 0
+
+        if verbose >=2:
+            print(newpost['fb_app_id'], newpost['medium'], newpost['mediumtype'], newpost['ismultiple'])
         
 
     except requests.exceptions.RequestException as error:

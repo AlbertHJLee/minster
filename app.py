@@ -95,7 +95,7 @@ def uploaded_file():
     
     filepart = fileurl.split('/')[1]
     fileout = 'static/'+filepart
-    shutil.copy2(fileurl,fileout)
+    shutil.copy2(fileurl,fileout) #
 
     url_for_image0 = url_for('static',filename=filepart)
     print url_for_image0

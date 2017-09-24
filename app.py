@@ -95,7 +95,7 @@ def uploaded_file():
     
     filepart = fileurl.split('/')[1]
     fileout = 'static/'+filepart
-    shutil.copy2(fileurl,fileout)
+    shutil.copy2(fileurl,fileout) #
 
     return render_template('output.html', imagefile=fileout,
                            imagefile1=fileout, imagefile2=fileout, imagefile3=fileout)

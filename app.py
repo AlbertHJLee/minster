@@ -97,11 +97,15 @@ def uploaded_file():
     fileout = 'static/'+filepart
     shutil.copy2(fileurl,fileout)
 
-    return render_template('output.html', imagefile=fileout,
+    url_for_image0 = url_for('static',filename=filepart)
+    print url_for_image0
+
+    return render_template('output.html', url0=url_for_image0,
                            imagefile1=fileout, imagefile2=fileout, imagefile3=fileout)
 
 
 
 if __name__ == '__main__':
 
-    app.run(debug=True, port=5957)
+    #app.run(debug=True, port=5957)
+    app.run(debug=True, host='0.0.0.0', port=5000)

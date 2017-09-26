@@ -347,8 +347,12 @@ def getUserInfo(username):
         likes += [ node[u'likes'][u'count'] ]
         comments += [ node[u'comments'][u'count'] ]
         counter += 1
+    counter = float(counter)
+    meanLikes = np.mean(np.array(likes))/counter
+    meanComments = np.mean(np.array(comments))/counter
 
-    return {'followers':followers, 'following':following, 'nposts':nposts}
+    return {'followers':followers, 'following':following, 'nposts':nposts,
+            'meanlikes':meanLikes, 'meancomments':meanComments}
 
 
 

@@ -201,3 +201,12 @@ def ntagsFromPandas(df):
 
 
 
+
+def meanLikesFromStruct(struct):
+    likes = []
+    comments = []
+    for node in struct[u'entry_data'][u'ProfilePage'][0][u'user'][u'media'][u'nodes']:
+        likes += [node[u'likes'][u'count']]
+        comments += [node[u'comments'][u'count']]
+    nplikes = np.array(likes)
+    return np.mean(nplikes), np.mean(np.array(comments))

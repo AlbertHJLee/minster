@@ -18,6 +18,9 @@ __pycache__/
 *.npy
 *.jpg
 *.png
+*.JPG
+*.PNG
+*.JPEG
 
 # API KEYS
 *.info

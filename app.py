@@ -38,7 +38,6 @@ def main():
             return redirect(request.url)
         file0 = request.files['filez']
         filelist = request.files.getlist('filez')
-        #print filelist
         
         # if user does not select file, browser also
         # submit a empty part without filename
@@ -46,6 +45,8 @@ def main():
             flash('No selected file')
             return redirect(request.url)
 
+        # if file is not an image, retry
+        
         flash('%d file(s) selected'%len(filelist))
         session['filepath'] = []
         for file in filelist:
@@ -105,7 +106,17 @@ def uploaded_file():
 
 
 
+@app.route('/slides')
+def showslides():
+    return render_template('slides.html')
+
+
+
 if __name__ == '__main__':
 
+<<<<<<< HEAD
     #app.run(debug=True, port=5957)
     app.run(debug=True, host='0.0.0.0', port=5000)
+=======
+    app.run(debug=True, host="0.0.0.0", port=5000)
+>>>>>>> 6aa6e1e2baa2790ffb819a19639b3eb10b42fe4b

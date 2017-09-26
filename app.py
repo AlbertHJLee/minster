@@ -101,7 +101,7 @@ def uploaded_file():
     url_for_image0 = url_for('static',filename=filepart)
     print url_for_image0
 
-    return render_template('output.html', url0=url_for_image0,
+    return render_template('output.html', url0=fileout,
                            imagefile1=fileout, imagefile2=fileout, imagefile3=fileout)
 
 
@@ -114,9 +114,5 @@ def showslides():
 
 if __name__ == '__main__':
 
-<<<<<<< HEAD
     #app.run(debug=True, port=5957)
     app.run(debug=True, host='0.0.0.0', port=5000)
-=======
-    app.run(debug=True, host="0.0.0.0", port=5000)
->>>>>>> 6aa6e1e2baa2790ffb819a19639b3eb10b42fe4b

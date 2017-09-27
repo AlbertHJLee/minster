@@ -97,7 +97,7 @@ def uploaded_file():
     
     filepart = fileurl.split('/')[1]
     fileout = 'static/'+filepart
-    shutil.copy2(fileurl,fileout) #
+    shutil.copy2(fileurl,fileout)
 
     return render_template('output.html', imagefile=fileout, prob0=prob,
                            imagefile1=fileout, imagefile2=fileout, imagefile3=fileout,
@@ -113,5 +113,5 @@ def showslides():
 
 if __name__ == '__main__':
 
-    #app.run(debug=True, port=5957)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
+

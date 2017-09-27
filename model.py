@@ -14,6 +14,9 @@ import features
 import utils
 import pickle
 
+from sklearn import linear_model, datasets
+from sklearn.metrics import mean_squared_error as MSE, r2_score as R2S
+
 res=300
 
 

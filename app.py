@@ -81,7 +81,7 @@ def uploaded_file():
     #print fileurl
 
     imagefiles = session['filepath']
-    fileurl = model.pickbest(imagefiles)
+    fileurl,prob = model.pickbest(imagefiles)
 
     files = []
     if len(imagefiles) >= 4:
@@ -89,8 +89,9 @@ def uploaded_file():
             filepart = tempurl.split('/')[1]
             files += ['static/'+filepart]
             shutil.copy2(tempurl,files[-1])
-        return render_template('output.html', imagefile=files[3],
-                               imagefile1=files[0], imagefile2=files[1], imagefile3=files[2])
+        return render_template('output.html', imagefile=files[3], prob0=prob[3],
+                               imagefile1=files[2], imagefile2=files[1], imagefile3=files[0],
+                               prob1=prob[2], prob2=prob[1], prob3=prob[0])
 
     print fileurl[0],type(fileurl[0])
     
@@ -98,8 +99,9 @@ def uploaded_file():
     fileout = 'static/'+filepart
     shutil.copy2(fileurl,fileout)
 
-    return render_template('output.html', imagefile=fileout,
-                           imagefile1=fileout, imagefile2=fileout, imagefile3=fileout)
+    return render_template('output.html', imagefile=fileout, prob0=prob,
+                           imagefile1=fileout, imagefile2=fileout, imagefile3=fileout,
+                           prob1=prob, prob2=prob, prob3=prob)
 
 
 

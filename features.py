@@ -9,6 +9,8 @@ from io import BytesIO
 
 from datetime import datetime, date
 
+from scipy.misc import imresize
+
 
 
 
@@ -124,6 +126,54 @@ def compKernels5():
     corner1 = np.array([])
 
     return notcos, notsin
+
+
+
+
+def getImageFeatures(image):
+
+    dims = 5
+    
+    sat = np.mean(colorfulness(image))
+    intensity = np.mean(image,2)
+    imgcontrast = contrast(image)
+    #comp = imresize(intensity,[dims,dims]).reshape([dims**2])
+
+    kernelCos,kernelSin,kernelCor1,kernelCor2,kernelCor3,kernelCor4 = compKernels(dims)
+
+    temp = imresize(intensity,[dims,dims])
+    kCos = np.mean(temp*kernelCos)
+    kSin = np.mean(temp*kernelSin)
+    kCor1 = np.mean(temp*kernelCor1)
+    kCor2 = np.mean(temp*kernelCor2)
+    kCor3 = np.mean(temp*kernelCor3)
+    kCor4 = np.mean(temp*kernelCor4)
+
+    #minsat = np.min(sat)
+    #maxsat = np.max(sat)
+    #mincon = np.min(imgcontrast)
+    #maxcon = np.max(imgcontrast)
+
+    #normSinA = np.abs(kSin)/np.max(np.abs(kSin))
+
+    #normsat = (sat - minsat)/(maxsat-minsat)
+    #normcontrast = (imgcontrast - mincon)/(maxcon-mincon)
+    #normCos = (kCos - np.mean(kCos))/(np.max(kCos) - np.min(kCos))
+    #normSin = (kSin - np.mean(kSin))/(np.max(kSin) - np.min(kSin))
+
+    nfeatures = 1+2+4+1+1
+    data = np.zeros([1,nfeatures])
+    data[:,0] = kCos
+    data[:,1] = kSin
+    data[:,2] = np.abs(kSin)
+    data[:,3] = kCor1 #kCor1/np.max(kCor1)
+    data[:,4] = kCor2 #kCor2/np.max(kCor2)
+    data[:,5] = kCor3 #kCor3/np.max(kCor3)
+    data[:,6] = kCor4 #kCor4/np.max(kCor4)
+    data[:,7] = sat
+    data[:,8] = imgcontrast
+
+    return data
 
 
 

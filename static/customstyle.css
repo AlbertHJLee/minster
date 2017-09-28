@@ -43,6 +43,14 @@ body {
 
 
 
+
+/* Custom styles for all pages */
+
+.content { padding-top: 7rem; }
+
+
+
+
 /* Custom styles for home page */
 
 .form-signin { max-width:500px !important }
@@ -50,6 +58,33 @@ body {
 .custom-button {height:30px  !important}
 
 .navbar-wrapper {}
+
+.navbar {
+    position: fixed;
+    right: .0rem;
+    left: .0rem;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: .5rem 1rem;
+}
+
+.widebutton {
+    background-color: #fff;
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+}
+
+.inputpage {
+    max-width: 800px;
+}
 
 
 
@@ -70,19 +105,9 @@ body {
     box-sizing: border-box
 }
 
-.widebutton {
-    background-color: #fff;
-    display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-}
+.content-output {padding-top: 0.6rem;}
 
-.inputpage {
-    max-width: 800px;
-}
-
-.jumbotron { background-color: #f6f6f6 }
+.jumbotron {background-color: #f6f6f6;}
 
 .scorebox {
     width:7rem;

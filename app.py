@@ -84,13 +84,15 @@ def uploaded_file():
     fileurl,prob = model.pickbest(imagefiles)
 
     files = []
+    fileurls = []
     if len(imagefiles) >= 4:
         for tempurl in imagefiles:
             filepart = tempurl.split('/')[1]
             files += ['static/'+filepart]
+	    fileurls += [url_for('static', filename=filepart)]
             shutil.copy2(tempurl,files[-1])
-        return render_template('output.html', imagefile=files[3], prob0=prob[3],
-                               imagefile1=files[2], imagefile2=files[1], imagefile3=files[0],
+        return render_template('output.html', imagefile=fileurls[3], prob0=prob[3],
+                               imagefile1=fileurls[2], imagefile2=fileurls[1], imagefile3=fileurls[0],
                                prob1=prob[2], prob2=prob[1], prob3=prob[0])
 
     print fileurl[0],type(fileurl[0])
@@ -113,5 +115,5 @@ def showslides():
 
 if __name__ == '__main__':
 
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=8000)
 

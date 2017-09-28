@@ -1,3 +1,5 @@
+/* Bootstrap stylings */
+
 body {
   padding-bottom: 40px;
   background-color: #ffffff;
@@ -38,10 +40,20 @@ body {
 }
 
 
+
+
+
+/* Custom styles for home page */
+
 .form-signin { max-width:500px !important }
 
 .custom-button {height:30px  !important}
 
+.navbar-wrapper {}
+
+
+
+/* Custom styles for output page */
 
 .cardc {
   width: 33.333%;
@@ -82,7 +94,6 @@ body {
     left: 50%;
     margin: 0 0 0 0;
 }
-
 
 .scorebox_top {
     width:10rem;

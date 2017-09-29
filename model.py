@@ -125,6 +125,7 @@ def pickbest(images):
     probs = getProbs(likes, regr_model)
 
     order = likes.argsort().tolist()
+    print order,likes,probs, images,[images[i] for i in order[-4:]]
 
     if nimages >= 4:
         return [images[i] for i in order[-4:]], ['%.4f'%probs[i] for i in order[-4:]]

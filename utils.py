@@ -197,11 +197,14 @@ def search(term, saveJpgs=False):
         imgurl = temp['display_src']
         height = temp['dimensions']['height']
         width = temp['dimensions']['width']
-        caption = temp['caption']
         likes = temp['likes']['count']
         comments = temp['comments']['count']
         date = temp['date']
-        
+        if 'caption' in temp:
+            caption = temp['caption']
+        else:
+            caption = ''
+            
         struct += [{'id':id, 'code':code, 'userid':userid, 
                     'imgurl':imgurl, 'height':height, 'width':width, 
                     'caption':caption, 'likes':likes, 'comments':comments, 'date':date}]
@@ -250,15 +253,23 @@ def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True, wait=120):
         np.save(imagefile,images)
 
         #time.sleep(20)
+        sys.stdout.flush()
         rout, wout, exout = select.select( [sys.stdin], [], [], wait )
 
         if (rout):
-            interrupt = True
-            print("Interrupted by", sys.stdin.readline().strip())
+            stdin = sys.stdin.readline()
+            if verbose >=2:
+                print(rout)
+            input = raw_input("Stop code? (y/n): ")
+            if input is "y":
+                interrupt = True
+                print("Interrupted by")
+            else:
+                print("Continuing...")
 
     print("Done (keyboard interrupt)")
 
-    return posts,images
+    return posts,images, rout
 
 
 

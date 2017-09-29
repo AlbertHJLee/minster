@@ -90,9 +90,7 @@ def pickbest2(images):
 def getModel():
 
     filename = 'models/LR_model.sav'
-    model,features = pickle.load(open(filename, 'rb'))
-    
-    return model,features
+    return pickle.load(open(filename, 'rb'))
 
 
 
@@ -113,19 +111,19 @@ def pickbest(images):
     nfeatures = regr_model.coef_.shape[0]
     data = np.zeros([nimages,nfeatures])
 
-    print nimages,nfeatures,npimages.shape,data.shape,featureList
+    #print nimages,nfeatures,npimages.shape,data.shape,featureList
     
     for i in range(nimages):
         image = Image.open(images[i])
         npimages[i] = utils.img2numpy(image.resize([res,res]))
         data[i,:] = features.getImageFeatures(npimages[i])[0,featureList[0:9]]  # using only the 9 image features
 
-    print data
+    #print data
     likes = regr_model.predict(data)
     probs = getProbs(likes, regr_model)
 
     order = likes.argsort().tolist()
-    print order,likes,probs, images,[images[i] for i in order[-4:]]
+    #print order,likes,probs, images,images
 
     if nimages >= 4:
         return [images[i] for i in order[-4:]], ['%.4f'%probs[i] for i in order[-4:]]

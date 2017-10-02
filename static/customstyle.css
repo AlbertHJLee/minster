@@ -57,6 +57,8 @@ body {
 
 .form-signin { max-width:500px !important }
 
+.normal-text { font-size:1.3rem !important }
+
 .custom-button {height:30px  !important}
 
 .navbar-wrapper {}

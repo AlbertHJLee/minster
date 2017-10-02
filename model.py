@@ -89,10 +89,33 @@ def pickbest2(images):
 
 def getModel():
 
-    filename = 'models/LR_model.sav'
-    model,features = pickle.load(open(filename, 'rb'))
-    
-    return model,features
+    #filename = 'models/LR_model.sav'
+    filename = 'models/LR_model_cake.sav'
+    return pickle.load(open(filename, 'rb'))
+
+
+
+def normalizeData(data,minvals,maxvals,centervals):
+    nfeatures = data.shape[1]
+    dataOut = data
+    print nfeatures,minvals.shape,data.shape,dataOut.shape,maxvals.shape,centervals.shape
+    for i in range(nfeatures):
+        dataOut[:,i] = (data[:,i] - centervals[i]) / (maxvals[i] - minvals[i])
+    return dataOut
+
+
+
+def revertData(data,minvals,maxvals,centervals):
+    nfeatures = minvals.shape[0]
+    reverted = data
+    for i in range(nfeatures):
+        reverted[:,i] = data[:,i] * (maxvals[i] - minvals[i]) + centervals[i]
+    return reverted
+
+
+
+def revert_y(y,min_y,max_y,center_y):
+    return y*(max_y-min_y) + center_y
 
 
 
@@ -109,23 +132,28 @@ def pickbest(images):
     likes = np.zeros(nimages)
     npimages = np.zeros([nimages,res,res,3])
 
-    regr_model,featureList = getModel()
-    nfeatures = regr_model.coef_.shape[0]
-    data = np.zeros([nimages,nfeatures])
+    #regr_model,featureList = getModel()
+    regr_model,featureList, min_y,max_y,center_y, minvals,maxvals,centervals = getModel()
+    nfeatures = minvals.shape[0]  #regr_model.coef_.shape[0]
+    nImgFeatures = 9
+    data = np.zeros([nimages,nImgFeatures])
 
-    print nimages,nfeatures,npimages.shape,data.shape,featureList
+    #print nimages,nfeatures,npimages.shape,data.shape,featureList
     
     for i in range(nimages):
         image = Image.open(images[i])
         npimages[i] = utils.img2numpy(image.resize([res,res]))
-        data[i,:] = features.getImageFeatures(npimages[i])[0,featureList[0:9]]  # using only the 9 image features
+        data[i,:] = features.getImageFeatures(npimages[i])[0,:]  #featureList[0:9]]  # using only the 9 image features
 
-    print data
-    likes = regr_model.predict(data)
-    probs = getProbs(likes, regr_model)
+    print data.shape,minvals.shape,maxvals.shape,centervals.shape
+    data = normalizeData(data,minvals,maxvals,centervals)
+
+    likes = regr_model.predict(data[:,featureList[0:9]])
+    likes_orig = revert_y(likes,min_y,max_y,center_y)
+    probs = getProbs(likes_orig, regr_model)
 
     order = likes.argsort().tolist()
-    print order,likes,probs, images,[images[i] for i in order[-4:]]
+    #print order,likes,probs, images,images
 
     if nimages >= 4:
         return [images[i] for i in order[-4:]], ['%.4f'%probs[i] for i in order[-4:]]

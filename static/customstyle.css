@@ -48,6 +48,8 @@ body {
 
 .content { padding-top: 7rem; }
 
+.jumbotron {background-color: #f6f6f6;}
+
 
 
 
@@ -86,6 +88,12 @@ body {
     max-width: 800px;
 }
 
+.banner {
+    max-width: 1140px;
+}
+
+.banner_j {background-color: #e6e6e6; padding:5px; !important}
+
 
 
 /* Custom styles for output page */
@@ -106,8 +114,6 @@ body {
 }
 
 .content-output {padding-top: 0.6rem;}
-
-.jumbotron {background-color: #f6f6f6;}
 
 .scorebox {
     width:7rem;

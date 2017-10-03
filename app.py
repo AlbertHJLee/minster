@@ -5,6 +5,7 @@ import pandas as pd
 import shutil
 
 from flask import send_from_directory
+import imghdr
 
 import model
 
@@ -24,9 +25,14 @@ app.config['SESSION_TYPE'] = 'filesystem'
 
 
 
-def allowed_file(filename):
+def allowed_ext(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+def allowed_file(file):
+    print '*****HERE*****'
+    print file, imghdr.what(file).lower()
+    return imghdr.what(file).lower() in allowed_extensions
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -50,7 +56,8 @@ def main():
         flash('%d file(s) selected'%len(filelist))
         session['filepath'] = []
         for file in filelist:
-            if file and allowed_file(file.filename):
+            print file.filename, file
+            if file and allowed_ext(file.filename) and allowed_file(file):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename) 
                 file.save(filepath)
@@ -97,16 +104,20 @@ def uploaded_file():
                                imagefile1=fileurls[2], imagefile2=fileurls[1], imagefile3=fileurls[0],
                                prob1=prob[2], prob2=prob[1], prob3=prob[0])
 
-    print besturls[0],type(besturls[0])
-    
-    filepart = besturls.split('/')[1]
-    fileout = 'static/'+filepart
-    shutil.copy2(besturls,fileout)
+    #print besturls[0],type(besturls[0])
 
-    return render_template('output.html', imagefile=fileout, prob0=prob,
-                           imagefile1=fileout, imagefile2=fileout, imagefile3=fileout,
-                           prob1=prob, prob2=prob, prob3=prob)
+    if len(imagefiles) > 0:
+        filepart = besturls.split('/')[1]
+        fileout = 'static/'+filepart
+        shutil.copy2(besturls,fileout)
 
+        return render_template('output.html', imagefile=fileout, prob0=prob,
+                               imagefile1=fileout, imagefile2=fileout, imagefile3=fileout,
+                               prob1=prob, prob2=prob, prob3=prob)
+
+    else:
+        flash('No valid file')
+        return render_template('index.html')
 
 
 @app.route('/slides')

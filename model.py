@@ -158,4 +158,4 @@ def pickbest(images):
     if nimages >= 4:
         return [images[i] for i in order[-4:]], ['%.4f'%probs[i] for i in order[-4:]]
     else:
-        return images[order[-1]], probs[order[-1]]
+        return images[order[-1]], '%.4f'%probs[order[-1]]

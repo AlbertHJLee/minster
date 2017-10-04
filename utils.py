@@ -121,11 +121,23 @@ def getPosts(userpage):
 
 
 
-def img2numpy(image):
+def img2numpy(img):
 
-    # Convert image to numpy array for analyses
+    """
+    Convert image to numpy array for analyses
+    input:  PIL image
+    output: numpy array (WxHx3) 
+    """
 
-    array = np.array(image.getdata()).reshape(image.size[0], image.size[1], 3)
+    # If image has alpha channel convert alpha to white
+    # https://stackoverflow.com/questions/9166400/
+    if np.array(img.getdata()).shape[1] is 4:
+        background = Image.new("RGB", img.size, (255, 255, 255))
+        background.paste(img, mask=img.split()[3])
+        img = background
+
+    # Map data to numpy array
+    array = np.array(img.getdata()).reshape(img.size[0], img.size[1], 3)
 
     return array
 

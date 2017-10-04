@@ -10,6 +10,7 @@ import imghdr
 import model
 
 length = 4
+verbose = 0
 
 UPLOAD_FOLDER = 'uploads'
 allowed_extensions = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -30,56 +31,48 @@ def allowed_ext(filename):
            filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 def allowed_file(file):
-    print '*****HERE*****'
-    print file, imghdr.what(file).lower()
     return imghdr.what(file).lower() in allowed_extensions
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
     if request.method == 'POST':
         
-        # check if the post request has the file part
+        # Check if POST request has the file part
         if 'filez' not in request.files:
             flash('No file part')
             return redirect(request.url)
         file0 = request.files['filez']
         filelist = request.files.getlist('filez')
         
-        # if user does not select file, browser also
-        # submit a empty part without filename
+        # If user does not select file, retry
         if file0.filename == '':
             flash('No selected file')
             return redirect(request.url)
 
-        # if file is not an image, retry
+        # Check every file to see if it's a valid format
+        # If all files aren't images, retry
         
         flash('%d file(s) selected'%len(filelist))
         session['filepath'] = []
         for file in filelist:
-            print file.filename, file
             if file and allowed_ext(file.filename) and allowed_file(file):
                 filename = secure_filename(file.filename)
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename) 
                 file.save(filepath)
                 session['filepath'] += [filepath]
-                #print url_for('uploaded_file')
+
+        if len(session['filepath']) is 0:
+            flash('No valid file')
+            return redirect(request.url)
 
         flash('%d file(s) selected'%len(filelist))
         return redirect(url_for('uploaded_file'))
-                #return redirect(url_for('uploaded_file',
-                #                        filename=filename))
 
     return render_template('index.html')
 
 
-"""
 
-@app.route('/uploads') #/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
 
-"""
 
 @app.route('/output')
 def uploaded_file():
@@ -93,18 +86,23 @@ def uploaded_file():
     files = []
     fileurls = []
     if len(imagefiles) >= 4:
+        
         for tempurl in besturls:
             filepart = tempurl.split('/')[1]
             files += ['static/'+filepart]
 	    fileurls += [url_for('static', filename=filepart)]
             shutil.copy2(tempurl,files[-1])
-        print ''
-        print prob, fileurls
+            
+        if verbose > 2:
+            print ''
+            print prob, fileurls
+            
         return render_template('output.html', imagefile=fileurls[3], prob0=prob[3],
                                imagefile1=fileurls[2], imagefile2=fileurls[1], imagefile3=fileurls[0],
                                prob1=prob[2], prob2=prob[1], prob3=prob[0])
 
-    #print besturls[0],type(besturls[0])
+    if verbose > 2:
+        print besturls[0],type(besturls[0])
 
     if len(imagefiles) > 0:
         filepart = besturls.split('/')[1]
@@ -120,6 +118,9 @@ def uploaded_file():
         return render_template('index.html')
 
 
+
+
+    
 @app.route('/slides')
 def showslides():
     return render_template('slides.html')

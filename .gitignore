@@ -21,6 +21,7 @@ __pycache__/
 *.JPG
 *.PNG
 *.JPEG
+*.zip
 
 # API KEYS
 *.info

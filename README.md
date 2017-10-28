@@ -50,14 +50,18 @@ The 46 features used in the regression model consist of image features and metad
 * 7 image kernels for detecting compositional features (e.g. how centered is the image)
 * saturation
 * contrast
-* # of hashtags
+* number of hashtags
 * day of the week, one hot encoded
 * hour of day, one hot encoded
 * flag for multiple images
-* # of followers
-* # followed
-* # of total posts by user
-* mean # of likes for user
+* number of followers
+* number followed
+* number of total posts by user
+* mean number of likes for user
+
+The mean number of likes were obviously the most informative, but the image features contributed to the model's predictive power, as evidenced by the fact that the model was able to recommend likeable images even when run on a single user's data.
+
+In terms of numbers, the final model had an R^2 score of 0.75 and a Spearman correlation of 0.9. This is expected to lead to a 20% increase in the number of likes. I calculated this by comparing the average number of likes a user would get by selecting any candidate image at random to the number of likes they would get if they only select images recommended by pikkit.
 
 
 <a id='Organization'></a>

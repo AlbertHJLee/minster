@@ -14,7 +14,7 @@ The web app allows users to upload images and get recommendations from the regre
 ## Outline of README:
 1. [Goals and Overview](#Goals)
 2. [Analysis and Model](#Analysis)
-3. [Latest Graphs](#Organization)
+3. [Directory structure](#Organization)
 
 
 <a id='Goals'></a>
@@ -40,10 +40,24 @@ A linear regression model is used to make this prediction. Given that likeabilit
 
 I settled on this approach after realizing that throwing more complex models at the data set - such as a neural net - did not produce noticeably better results because simply knowing what feature is informative was the main bottleneck.
 
-I focused on food-related instagram posts in order to scope down the requirements of my model and also to have a consistent set of image features and properties that could be modeled linearly. After multiple rounds of selecting features I converged on a final model with 67 features.
+I focused on food-related instagram posts in order to scope down the requirements of my model and also to have a consistent set of image features and properties that could be modeled linearly. After multiple rounds of selecting features I converged on a final model with 46 features.
+
 
 <a id='Analysis'></a>
 ## 2. Analysis and Model
+
+The 46 features used in the regression model consist of image features and metadata features:
+* 7 image kernels for detecting compositional features (e.g. how centered is the image)
+* saturation
+* contrast
+* # of hashtags
+* day of the week, one hot encoded
+* hour of day, one hot encoded
+* flag for multiple images
+* # of followers
+* # followed
+* # of total posts by user
+* mean # of likes for user
 
 
 <a id='Organization'></a>

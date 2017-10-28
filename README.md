@@ -21,14 +21,14 @@ The web app allows users to upload images and get recommendations from the regre
 ## 1. Goals and Overview
 
 <p align="center">
-<img src="http://pikkit.site/static/demo_img_best.jpg" alt="Best Picture Ever" height=100px width=100px>
-<img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="Best Picture Ever" height=100px width=100px>
-<img src="http://pikkit.site/static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px>
-<img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px>
+<img src="http://pikkit.site/static/demo_img_best.jpg" alt="Best Picture Ever" height=150px width=150px>
+<img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="Best Picture Ever" height=150px width=150px>
+<img src="http://pikkit.site/static/demo_img_corner.jpg" alt="Best Picture Ever" height=150px width=150px>
+<img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=150px width=150px>
 </p>
 
 <p align="center">
-<img src="http://pikkit.site/static/demo_img_best.jpg" alt="demo_best" height=100px width=100px>
+<img src="http://pikkit.site/static/demo_img_best.jpg" alt="demo_best" height=100px width=100px border="2">
 <img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="demo_contrast" height=100px width=100px style="opacity:0.4;">
 <img src="http://pikkit.site/static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px style="opacity:0.4;filter:alpha(opacity=40);">
 <img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px style="opacity:0.4;filter:alpha(opacity=40);">

@@ -20,6 +20,9 @@ The web app allows users to upload images and get recommendations from the regre
 <a id='Goals'></a>
 ## 1. Goals and Overview
 
+Pikkit is a tool for predicting the popularity of an image on Instagram.
+Given some set of images with dfferent aesthetic features, such as the following:
+
 <p align="center">
 <img src="http://pikkit.site/static/demo_img_best.jpg" alt="Best Picture Ever" height=150px width=150px>
 <img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="Best Picture Ever" height=150px width=150px>
@@ -27,12 +30,17 @@ The web app allows users to upload images and get recommendations from the regre
 <img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=150px width=150px>
 </p>
 
+Pikkit will pick the image with the best visual characteristics:
+
 <p align="center">
-<img src="http://pikkit.site/static/demo_img_best.jpg" alt="demo_best" height=100px width=100px border="2">
-<img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="demo_contrast" height=100px width=100px style="opacity:0.4;">
-<img src="http://pikkit.site/static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px style="opacity:0.4;filter:alpha(opacity=40);">
-<img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px style="opacity:0.4;filter:alpha(opacity=40);">
+<img src="http://pikkit.site/static/demo_img_best.jpg" alt="demo_best" height=150px width=150px border="2">
 </p>
+
+A linear regression model is used to make this prediction. Given that likeability does not have a linear relationship with many of the features in an image, I had to do a lot of feature engineering to arrive at a useful set of features. I used an iterative strategy of engineering some features, running a feature selection algorithm, and then engineering new features based on what kind of information had predictive power in the previous iteration.
+
+I settled on this approach after realizing that throwing more complex models at the data set - such as a neural net - did not produce noticeably better results because simply knowing what feature is informative was the main bottleneck.
+
+I focused on food-related instagram posts in order to scope down the requirements of my model and also to have a consistent set of image features and properties that could be modeled linearly. After multiple rounds of selecting features I converged on a final model with 67 features.
 
 <a id='Analysis'></a>
 ## 2. Analysis and Model

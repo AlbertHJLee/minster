@@ -7,8 +7,22 @@ This repository consists of a python package, an ipython script, and a web app. 
 The web app allows users to upload images and get recommendations from the regression model running on the backend. It is hosted at www.pikkit.site
 
 
+# Outline of README:
+1. [Goals and Overview](#Goals)
+2. [Analysis and Model](#Analysis)
+3. [Latest Graphs](#Organization)
+
+
+<a id='Goals'></a>
+## 1. Directory structure
+
+
+<a id='Analysis'></a>
+## 2. Directory structure
+
+
 <a id='Organization'></a>
-## 4. Directory structure
+## 3. Directory structure
 
     ├── LICENSE
     ├── .gitignore
@@ -50,8 +64,9 @@ The web app allows users to upload images and get recommendations from the regre
     │
     │
     ├── features.py        <- Suite of tools for extracting image and metadata features
-    │                         
+    │  
+    ├── model.py           <- Tools for loading and running regression model
     │
-    └── utils.py           <- Suite of tools for scraping, manipulating, and formatting data
+    └── utils.py           <- Tools for scraping, manipulating, and formatting data
    
 * https://github.com/rarcega/instagram-scraper

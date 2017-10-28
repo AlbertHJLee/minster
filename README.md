@@ -11,7 +11,7 @@ This repository consists of a python package, an ipython script, and a web app. 
 The web app allows users to upload images and get recommendations from the regression model running on the backend. It is hosted at www.pikkit.site
 
 
-# Outline of README:
+## Outline of README:
 1. [Goals and Overview](#Goals)
 2. [Analysis and Model](#Analysis)
 3. [Latest Graphs](#Organization)
@@ -28,10 +28,10 @@ The web app allows users to upload images and get recommendations from the regre
 </p>
 
 <p align="center">
-<img src="http://pikkit.site/static/demo_img_best.jpg" alt="Best Picture Ever" height=100px width=100px>
-<img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="Best Picture Ever" height=100px width=100px opacity=0.3>
-<img src="http://pikkit.site/static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px opacity=0.3>
-<img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px opacity=0.3>
+<img src="http://pikkit.site/static/demo_img_best.jpg" alt="demo_best" height=100px width=100px>
+<img src="http://pikkit.site/static/demo_img_contrast.jpg" alt="demo_contrast" height=100px width=100px style="opacity:0.4;">
+<img src="http://pikkit.site/static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px style="opacity:0.4;filter:alpha(opacity=40);">
+<img src="http://pikkit.site/static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px style="opacity:0.4;filter:alpha(opacity=40);">
 </p>
 
 <a id='Analysis'></a>

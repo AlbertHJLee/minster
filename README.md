@@ -1,5 +1,9 @@
 # pikkit
 
+<p align="center">
+  <img src="http://pikkit.site/static/pikkit_banner.png" alt="pikkit banner"/>
+</p>
+
 Pikkit is a machine learning tool for predicting the popularity of Instagram posts.
 
 This repository consists of a python package, an ipython script, and a web app. The script scrapes Instagram data and trains a linear regression model based on the data. It automatically rejects outliers and selects features based on their importance.
@@ -14,11 +18,24 @@ The web app allows users to upload images and get recommendations from the regre
 
 
 <a id='Goals'></a>
-## 1. Directory structure
+## 1. Goals and Overview
 
+<p align="center">
+<img src="../static/demo_img_best.jpg" alt="Best Picture Ever" height=100px width=100px>
+<img src="../static/demo_img_contrast.jpg" alt="Best Picture Ever" height=100px width=100px>
+<img src="../static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px>
+<img src="../static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px>
+</p>
+
+<p align="center">
+<img src="../static/demo_img_best.jpg" alt="Best Picture Ever" height=100px width=100px>
+<img src="../static/demo_img_contrast.jpg" alt="Best Picture Ever" height=100px width=100px opacity=0.3>
+<img src="../static/demo_img_corner.jpg" alt="Best Picture Ever" height=100px width=100px opacity=0.3>
+<img src="../static/demo_img_gray.jpg" alt="Best Picture Ever" height=100px width=100px opacity=0.3>
+</p>
 
 <a id='Analysis'></a>
-## 2. Directory structure
+## 2. Analysis and Model
 
 
 <a id='Organization'></a>

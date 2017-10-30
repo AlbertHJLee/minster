@@ -72,10 +72,10 @@ In terms of numbers, the final model had an R^2 score of 0.75 and a Spearman cor
     ├── README.md          <- Overview of project
     │
     ├── data               <- This folder contains .json files of metadata of posts from Instagram
-    │   ├── *.json         <- jsons scraped using utils.getData() or instagram-scraper*
+    │   ├── *.json         <- jsons scraped using utils.getData() or instagram-scraper**
     │   :     :
     │   └── images         <- This folder contains images scraped from Instagram
-    │       └── *.jpg      <- jpgs scraped using utils.getData() or instagram-scraper*
+    │       └── *.jpg      <- jpgs scraped using utils.getData() or instagram-scraper**
     │             :
     │
     ├── exploration.ipynb          <- ipython notebook documenting data exploration
@@ -112,4 +112,4 @@ In terms of numbers, the final model had an R^2 score of 0.75 and a Spearman cor
     │
     └── utils.py           <- Tools for scraping, manipulating, and formatting data
    
-* https://github.com/rarcega/instagram-scraper
+\*\* https://github.com/rarcega/instagram-scraper

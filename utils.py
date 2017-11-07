@@ -74,23 +74,6 @@ def getImage(userpage, index):
 
 
 
-def getImagesOld(userpage):
-
-    struct = json.loads(page.content)
-
-    imgurls = []
-    codes = []
-    images = []
-
-    for post in struct['items']:
-        imgurls += [post['images']['standard_resolution']['url']]
-        codes += [post['code']]
-        images += [Image.open(BytesIO(requests.get(imgurls[-1]).content))]
-
-    return imgurls,codes,images
-
-
-
 
 
 def getPosts(userpage):
@@ -155,28 +138,6 @@ def jsonStructFromPageContent(content):
     return struct
     
 
-
-
-
-
-def search_old(term):
-
-    page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
-    content = page.content
-
-    sharedData = content.split('<script type="text/javascript">window._sharedData = ')
-    substrings = sharedData[1].split('}, {')
-    struct = []
-
-    i=0
-    length = len(substrings)
-    print(str(length) + ' results')
-
-    for string in substrings[1:(length-10)]:
-
-        struct += [json.loads('{'+string+'}')]
-
-    return struct
 
 
 
@@ -326,9 +287,8 @@ def getData(file='posts_photography_1505164452.json', updated=True, rawimages=Fa
     """
     Load data
     """
-    
-    with open('data/'+file,'r') as infile:
-        posts = json.load(infile)
+
+    posts = openJson('data/'+file)
 
     substr = file.split('posts_')[-1].split('.json')[0]
     
@@ -339,8 +299,7 @@ def getData(file='posts_photography_1505164452.json', updated=True, rawimages=Fa
         rawimages = True
 
     if updated:
-        with open('data/posts3_'+substr+'.json','r') as infile:
-            posts = json.load(infile)
+        posts = openJson('data/posts3_'+substr+'.json')
     
     if rawimages:
         images = imagesFromFiles(substr.split('_')[-1].split('.')[0],len(posts))

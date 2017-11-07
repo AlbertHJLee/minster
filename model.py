@@ -23,6 +23,11 @@ res=300
 
 
 
+
+# These next three functions are defunct.
+# They were used to test the pikkit.site backend in its early stages.
+
+
 def likesFromSat(image):
 
     nbins = 20
@@ -39,10 +44,9 @@ def likesFromSat(image):
     contrast = features.contrast(image)
     comp = imresize(intensity,[dims,dims]).reshape([dims**2])
 
-    likes = sat #contrast
+    likes = sat 
     
     return likes
-
 
 
 
@@ -119,11 +123,13 @@ def revert_y(y,min_y,max_y,center_y):
 
 
 
+# Placeholder function for future versions of pikkit
+# Eventually will convert likes to probabilities of increased user engagement
 def getProbs(likes, model):
     probs = likes
     return probs
 
-
+    
 
 
 def pickbest(images):
@@ -132,14 +138,13 @@ def pickbest(images):
     likes = np.zeros(nimages)
     npimages = np.zeros([nimages,res,res,3])
 
-    #regr_model,featureList = getModel()
+    # Load model
     regr_model,featureList, min_y,max_y,center_y, minvals,maxvals,centervals = getModel()
     nfeatures = minvals.shape[0]  #regr_model.coef_.shape[0]
     nImgFeatures = 9
     data = np.zeros([nimages,nImgFeatures])
 
-    #print nimages,nfeatures,npimages.shape,data.shape,featureList
-    
+    # Convert input images to correct format
     for i in range(nimages):
         image = Image.open(images[i])
         npimages[i] = utils.img2numpy(image.resize([res,res]))
@@ -148,13 +153,15 @@ def pickbest(images):
     print data.shape,minvals.shape,maxvals.shape,centervals.shape
     data = normalizeData(data,minvals,maxvals,centervals)
 
+    # Run images through model
     likes = regr_model.predict(data[:,featureList[0:9]])
     likes_orig = revert_y(likes,min_y,max_y,center_y)
     probs = getProbs(likes_orig, regr_model)
 
     order = likes.argsort().tolist()
-    #print order,likes,probs, images,images
 
+    # Return probabilities of being a good image
+    # Currently using predicted number of likes as proxy for probability
     if nimages >= 4:
         return [images[i] for i in order[-4:]], ['%.4f'%probs[i] for i in order[-4:]]
     else:

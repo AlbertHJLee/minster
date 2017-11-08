@@ -23,6 +23,10 @@ __pycache__/
 *.JPEG
 *.zip
 
+# unused website assets
+static/assets/*
+static/styles/*css
+
 # API KEYS
 *.info
 

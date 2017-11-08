@@ -25,6 +25,15 @@ res = 300
 
 def saveJson(struct,file):
 
+    """
+    Write a python dict to a file as a json string
+
+    inputs: 
+      struct - python dict
+      file - string of file to save to
+
+    """
+
     with open(file,'w') as outfile:
         json.dump(struct,outfile)
 
@@ -33,6 +42,17 @@ def saveJson(struct,file):
 
 
 def openJson(file):
+
+    """
+    Read json file in as a python dict
+
+    input:  
+      file - string of file to read from
+
+    output: 
+      data - dict
+
+    """
 
     with open(file,'r') as infile:
         data = json.load(infile)
@@ -47,6 +67,15 @@ def getUserMedia(user):
 
     """
     Get json of user page data
+    Only returns first page of media. Use instagram-scraper to get all media.
+
+    input:   
+      user - string of Instagram user to scrape
+
+    outputs: 
+      page - requests page object for user
+      struct - dict-ified data from json
+
     """
 
     page = requests.get('https://www.instagram.com/'+user+'/media/')
@@ -60,7 +89,17 @@ def getUserMedia(user):
 
 def getImage(userpage, index):
 
-    # Get image from user page
+    """
+    Get image from user page
+
+    inputs: 
+      userpage - requests page object
+      index - integer specifying image
+
+    output:
+      image - Pillow image object
+
+    """
 
     struct = json.loads(page.content)
 
@@ -130,6 +169,14 @@ def img2numpy(img):
 
 def jsonStructFromPageContent(content):
 
+    """
+    Extract json content from an Instagram page
+    Works with Instagram as of 2017-11-07
+
+    input:  raw html string from Instagram page
+    output: json data converted to dict
+    """
+
     string = content.split('<script type="text/javascript">window._sharedData = ')
     string = string[1].split(';</script>')[0]
 
@@ -144,7 +191,20 @@ def jsonStructFromPageContent(content):
 
 def search(term, saveJpgs=False):
 
-    # Get latest n~15 posts for a given tag
+    """
+    Get latest n~15 posts for a given tag
+
+    inputs:  
+      term - string specifying hashtag to search (don't include the #)
+
+    outputs: 
+      struct - dict-ified json data of the latest n posts
+      images - numpy array of corresponding images
+
+    keywords:
+      saveJpgs - if true, save original jpgs
+
+    """
 
     page = requests.get('https://www.instagram.com/explore/tags/'+term+'/')
     content = page.content
@@ -198,8 +258,24 @@ def search(term, saveJpgs=False):
 def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True, wait=120):
 
     """
-    Keep scraping tag until keyboard interrupt
+    Keep scraping tag until keyboard interrupt.
+    Save current list of posts and images after each iteration.
     wrapper for search()
+
+    inputs:
+      term - hashtag to search
+
+    outputs:
+      posts - dictified list of json data from posts
+      images - numpy array of corresonding images appended together
+      rout - flag for whether sys.stdin read correctly during keyboard interrupt
+
+    keywords:
+      verbose - suppress printed outputs with lower integers
+      saveImages - if true, save numpy-fied array of images
+      saveJpgs - if true, save original jpgs
+      wait - no. of seconds to wait before making next request to Instagram
+
     """
 
     timestamp = str(int(time.time()))
@@ -225,7 +301,6 @@ def searchLoop(term, verbose=1, saveImages=True, saveJpgs=True, wait=120):
 
         np.save(imagefile,images)
 
-        #time.sleep(20)
         sys.stdout.flush()
         rout, wout, exout = select.select( [sys.stdin], [], [], wait )
 
@@ -252,6 +327,16 @@ def imagesFromFiles(substr,nposts):
     """
     Open all images in a directory with the right range of timestamps
     given a list of posts
+
+    inputs:
+      substr - string that should be in the name of the file from which we start counting
+               the number of files needed to match the number of posts
+               (assumes every post has a corresponding file)
+      nposts - number of files to read in
+
+    output:
+      images - numpy array of images
+
     """
 
     files = os.listdir('data/images')
@@ -286,6 +371,17 @@ def getData(file='posts_photography_1505164452.json', updated=True, rawimages=Fa
 
     """
     Load data
+
+    inputs:
+      file - name of json file to get instagram post data from
+      updated - if updateData has been run on a posts_*.json file, set this
+                to True to read in the updated version (posts3_*.json)
+      rawimages - if raw images have been saved, set this to True to read them in
+
+    outputs:
+      posts - dictified json of post data
+      images - numpy array of corresponding images
+
     """
 
     posts = openJson('data/'+file)
@@ -310,6 +406,10 @@ def getData(file='posts_photography_1505164452.json', updated=True, rawimages=Fa
 
 
 def getUserInfo(username):
+
+    """
+    Get user metadata from a Instagram account page
+    """
 
     page = requests.get('https://www.instagram.com/'+username)
     soup = bs(page.content, 'html.parser')
@@ -391,6 +491,15 @@ def userFromPost(post, verbose=1):
 
 def usersFromPosts(posts, verbose=1):
 
+    """
+    Wrapper for userFromPost
+
+    Used to scrape Instagram for the users corresponding to each scraped post.
+    This is necessary for extracing user-related metadata, e.g. the number of
+    followers or the average number of likes.
+
+    """
+    
     users = []
     i = 0
     
@@ -416,6 +525,15 @@ def usersFromPosts(posts, verbose=1):
 
 def updatePost(post, verbose=1):
 
+    """
+    Given the dictified json of an instagram post, update it in case it has
+    received more likes and comments since the initial scrape. Also, add new features.
+
+    input:  dict of json of post
+    output: new dict
+
+    """
+    
     code = post['code']
     newpost = post.copy()
 
@@ -488,6 +606,11 @@ def updatePost(post, verbose=1):
 
 def updateData(posts, verbose=1):
 
+    """
+    Wrapper for updatePost
+    Iterate through entire list of posts and update each post
+    """
+    
     newposts = []
     i = 0
     
@@ -518,6 +641,15 @@ def dataFromScraper(account, getImages=True):
     """
     Get data from instagram-scraper output
     Match format of utils output
+
+    inputs:
+      account - string of scraped instagram account
+      getImages - load images is True (set to False to save memory when debugging)
+
+    outputs:
+      data - dict of post data
+      images - numpy array of images
+
     """
 
     dir = os.path.join('/home','albert','Data','scraper',account)

@@ -22,8 +22,13 @@ Image features
 
 def contrast(image):
 
-    # "contrast" measured as the standard deviation
-    # Other metric might be better
+    """
+    "contrast" measured as the standard deviation
+    Other metric might be better
+
+    input:  image as a numpy array
+    output: contrast as a floating point
+    """
     
     return np.sqrt( np.var(image) )
 
@@ -33,7 +38,12 @@ def contrast(image):
 
 def rgb2xyz(rgb):
 
-    # Convert to XYZ color space
+    """
+    Convert RGB to XYZ color space
+
+    input:   image as a numpy array with 3 channels (RGB)
+    outputs: X, Y, and Z channels
+    """
 
     x = 0.49*rgb[:,:,0] + 0.31*rgb[:,:,1] + 0.2*rgb[:,:,2]
     y = 0.177*rgb[:,:,0] + 0.812*rgb[:,:,1] + 0.011*rgb[:,:,2]
@@ -46,26 +56,51 @@ def rgb2xyz(rgb):
 
 def colorfulness(image, option='rgb'):
 
-    # How far the RGB components are removed from true gray
+    """
+    How far the RGB components are removed from true gray
+    (This is close to how we perceive how much color is present in an image)
+    
+    inputs:  
+      image - image as numpy array with 3 color channels
+      option - keyword specifying which color space to use
+
+    output:
+      colorfulness as floating point
+
+    """
 
     if (option == 'rgb'):
 
         I = image.mean(2)
-        C = np.sqrt((image[:,:,0]-I)**2 + (image[:,:,1]-I)**2 + (image[:,:,2]-I)**2)
+        colorfulness = np.sqrt((image[:,:,0]-I)**2 + (image[:,:,1]-I)**2 + (image[:,:,2]-I)**2)
 
     elif (option == 'xyz'):
         
         x,y,_ = rgb2xyz(image)
-        C = np.sqrt(x**2 + y**2)
+        colorfulness = np.sqrt(x**2 + y**2)
 
-    return C
+    return colorfulness
 
 
 
 
 def saturation(image, options=['rgb','mean']):
 
-    # Given some brightness, how colorful the RGB components are
+    """
+    Given some brightness, how colorful the RGB components are.
+
+    In other words, if something is fairly bright, and sending a lot of photons,
+    the non-white-ness of the photons should scale accordingly. I.e. the signal in
+    the color should scale proportionally to the signal in the intensity (brightness)
+
+    inputs:
+      image - numpy image
+      options - [ string_specifying_color_space, string_specifying_conversion_to_gray ]
+
+    output:
+      saturation
+
+    """
 
     C = colorfulness(image,options[0])
  
@@ -88,6 +123,13 @@ def compKernels(res):
     built from sinc interpolation and sine functions
     
     Maybe better to use cosine and sine?
+
+    input: integer specifying resolution of image we want to generate kernels for
+    outputs:
+      sinc - 1D sinc function kernel
+      sin - 1D sine kernel
+      corner1 etc. - 2D Gaussian kernel displaced to corner of image
+
     """
 
     offset = float(int(float(res)*.5))
@@ -120,6 +162,10 @@ def compKernels(res):
 
 def compKernels5():
 
+    """
+    Hard coded kernels used for testing
+    """
+
     notcos = np.array([-.7,.2,1.,.2,-.7])
     notsin = np.array([-1.,-.7,0.,.7,1.])
 
@@ -132,6 +178,13 @@ def compKernels5():
 
 def getImageFeatures(image):
 
+    """
+    Extract image features from image
+
+    input:  numpy image
+    output: numpy array of extracted features
+    """
+    
     dims = 5
     
     sat = np.mean(colorfulness(image))
@@ -186,6 +239,11 @@ Textual features
 
 
 def not_in_list(x,args,y):
+
+    """
+    Check whether a string is in a list of hashtags
+    """
+    
     list = x['caption'].split(' #')
     return not (args in list[1:])
 
@@ -194,8 +252,10 @@ def not_in_list(x,args,y):
 
 def convertString(x):
 
-    # Converts textual description of likes to integer
-    # i.e. - '16.5k' -> 16,500
+    """
+    Converts textual description of number of likes to integer
+    i.e. - '16.5k' -> 16,500
+    """
     
     string = str(x)
     if 'k' in string:
@@ -211,9 +271,19 @@ def convertString(x):
 
 def extractTimeData(x):
 
-    # Get time data from timestamp
-    # use indexing to get weekday or hour
-    
+    """
+    Get time data from timestamp
+    use indexing to get weekday or hour
+
+    input:
+      timestamp of either unicode or integer format
+
+    outputs:
+      Monday to Sunday -> 0 to 6  (7 if no timestamp)
+      00:00 to 23:00 -> 0 to 23  (25 if no timestamp)
+
+    """
+
     if (type(x) is unicode):
         createdtime = datetime.fromtimestamp(int(x))
         hour = createdtime.hour
@@ -232,6 +302,11 @@ def extractTimeData(x):
 
     
 def getnposts(x):
+
+    """
+    Get total number of posts
+    """
+    
     if type(x) is list:
         npostunicode = x[0]
         return convertString(npostunicode)
@@ -243,16 +318,31 @@ def getnposts(x):
 
     
 def likesFromPandas(df):
+    """
+    From a dictified json of a list of Instagram posts, extract no. of likes
+    """
     return df['likes'].apply(lambda x: float(convertString(x))).values
 
 
 def ntagsFromPandas(df):
+    """
+    From a dictified json of a list of Instagram posts, extract no. of hashtags
+    """
     return df[u'caption'].apply(lambda x: float( len(x.split(' #')) ) ).values - 1
 
 
 
 
 def meanLikesFromStruct(struct):
+
+    """
+    Average number of likes and comments in most recent page of posts on a user's account
+    (typically last ~16 posts)
+
+    input:   dictified json of user page
+    outputs: mean no. likes, mean no. comments
+    """
+    
     likes = []
     comments = []
     for node in struct[u'entry_data'][u'ProfilePage'][0][u'user'][u'media'][u'nodes']:

@@ -12,13 +12,43 @@ The web app allows users to upload images and get recommendations from the regre
 
 
 ## Outline of README:
-1. [Goals and Overview](#Goals)
-2. [Analysis and Model](#Analysis)
-3. [Directory structure](#Organization)
+1. [Running the code](#Runcode)
+2. [Goals and Overview](#Goals)
+3. [Analysis and Model](#Analysis)
+4. [Directory structure](#Organization)
 
+
+
+<a id='Runcode'></a>
+## 1. Running the code
+
+First make sure all necessary packages have been installed:
+
+    $ pip install requests
+    $ pip install Pillow
+    $ pip install beautifulsoup4
+    $ pip install instagram-scraper
+    
+(If you don't have numpy, scipy, sklearn, Flask, etc. you'll need those too.)
+    
+In order to scrape specific users on Instagram:
+
+    $ cd <directory_for_data>
+    $ instagram-scraper <username> --media_metadata 
+
+In order to scrape a hashtag, open python and run (without the # in the string):
+
+    > posts,images,rout = utils.searchLoop('<yourhashtag>',saveImages=False,saveJpgs=True,wait=180)
+  
+The keyword wait specifies how long in seconds to wait before making the next GET request from Instagram. For popular tags, like 'cat', 30 seconds is usually long enough during peak hours. For popular food related tags, 2 minutes is more reasonable.
+
+The analysis is mainly carried out in feature_engineering.ipynb, which calls most of the important functions from features.py and utils.py. Making everything callable from the command line is my first order of business but the ipython notebook should at least make it clear what I'm doing.
+
+Once a model is saved from the ipython script, it can be used by pikkit.site's backend. The backend runs using functions from app.py and model.py. If you use Flask, these should run as is. Hosting it on a dedicated server (e.g. on AWS) will require some set up.
+    
 
 <a id='Goals'></a>
-## 1. Goals and Overview
+## 2. Goals and Overview
 
 Pikkit is a tool for predicting the popularity of an image on Instagram.
 Given some set of images with dfferent aesthetic features, such as the following:
@@ -44,7 +74,7 @@ I focused on food-related instagram posts in order to scope down the requirement
 
 
 <a id='Analysis'></a>
-## 2. Analysis and Model
+## 3. Analysis and Model
 
 The 46 features used in the regression model consist of image features and metadata features:
 * 7 image kernels for detecting compositional features (e.g. how centered is the image)
@@ -65,7 +95,7 @@ In terms of numbers, the final model had an R^2 score of 0.75 and a Spearman cor
 
 
 <a id='Organization'></a>
-## 3. Directory structure
+## 4. Directory structure
 
     ├── LICENSE
     ├── .gitignore

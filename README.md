@@ -36,8 +36,11 @@ In order to scrape specific users on Instagram:
     $ cd <directory_for_data>
     $ instagram-scraper <username> --media_metadata 
 
-In order to scrape a hashtag, open python and run (without the # in the string):
+In order to scrape a hashtag, open python and run searchLoop (without the # in the string):
 
+    $ cd <directory_of_this_repository>
+    $ python
+    > import utils
     > posts,images,rout = utils.searchLoop('<yourhashtag>',saveImages=False,saveJpgs=True,wait=180)
   
 The keyword wait specifies how long in seconds to wait before making the next GET request from Instagram. For popular tags, like 'cat', 30 seconds is usually long enough during peak hours. For popular food related tags, 2 minutes is more reasonable.
@@ -102,6 +105,7 @@ In terms of numbers, the final model had an R^2 score of 0.75 and a Spearman cor
     ├── README.md          <- Overview of project
     │
     ├── data               <- This folder contains .json files of metadata of posts from Instagram
+    │   │                       (not included in repository due to size)
     │   ├── *.json         <- jsons scraped using utils.getData() or instagram-scraper**
     │   :     :
     │   └── images         <- This folder contains images scraped from Instagram

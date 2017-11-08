@@ -34,7 +34,7 @@ First make sure all necessary packages have been installed:
 In order to scrape specific users on Instagram:
 
     $ cd <directory_for_data>
-    $ instagram-scraper <username> --media-metadata 
+    $ instagram-scraper <username> --media_metadata 
 
 In order to scrape a hashtag, open python and run (without the # in the string):
 
@@ -44,7 +44,7 @@ The keyword wait specifies how long in seconds to wait before making the next GE
 
 The analysis is mainly carried out in feature_engineering.ipynb, which calls most of the important functions from features.py and utils.py. Making everything callable from the command line is my first order of business but the ipython notebook should at least make it clear what I'm doing.
 
-Once a model is saved from the ipython script, it can be used by pikkit.site's backend. The backend runs using functions from app.py and model.py. If you use Flask, these should almost run as is. Hosting it on a dedicated server (e.g. on AWS) will require some set up.
+Once a model is saved from the ipython script, it can be used by pikkit.site's backend. The backend runs using functions from app.py and model.py. If you use Flask, these should run as is. Hosting it on a dedicated server (e.g. on AWS) will require some set up.
     
 
 <a id='Goals'></a>
